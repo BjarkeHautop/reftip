@@ -1,9 +1,5 @@
-# First sentence of a flattened Rd description, whitespace-normalized and
-# capped so a runaway paragraph can't blow up a tooltip. Simpler than
-# DocumenterCodeBlocks's version (references.jl `_first_sentence`) --
-# R docstrings don't have the `sort!`-style bang-function or `e.g.`-heavy
-# abbreviation problem to the same degree -- but the same idea: cut at the
-# first `.`/`!`/`?` followed by whitespace or end of string.
+# First sentence of a flattened Rd description, capped so a runaway
+# paragraph can't blow up a tooltip.
 .first_sentence <- function(text, max_chars = 200) {
     if (is.null(text)) {
         return(NULL)

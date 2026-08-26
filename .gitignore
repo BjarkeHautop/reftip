@@ -9,3 +9,12 @@ _quarto/
 dev/fixturepkg/docs/
 dev/fixturepkg/_quarto/
 dev/fixturepkg/altdoc/
+altdoc/freeze.rds
+_quarto/*
+!_quarto/_freeze/
+
+# Staged by altdoc/build-site.R for the duration of the build; removed
+# afterward, but ignored as a safety net in case a build is interrupted.
+man/animal.Rd
+man/greet.Rd
+vignettes/demo.qmd

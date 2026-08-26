@@ -4,20 +4,27 @@
 \alias{build_topic_index}
 \title{Build a reference index from a package's Rd files}
 \usage{
-build_topic_index(path = ".")
+build_topic_index(path = ".", quiet = FALSE)
 }
 \arguments{
 \item{path}{Path to the package root (must contain a \verb{man/} directory).}
+
+\item{quiet}{Logical. Suppress the warning issued when a \verb{\\\\usage\{\}} block
+couldn't be narrowed to one alias.}
 }
 \value{
-A named list, one entry per alias, each holding \code{usage} (character,
-the raw \verb{\\\\usage\{\}} text) and \code{brief} (character or \code{NULL}, the first
-sentence of \verb{\\\\description\{\}}).
+A named list, one entry per alias, each holding \code{usage}, \code{brief}
+(character or \code{NULL}), and \code{topic}.
 }
 \description{
 Parses every \verb{man/*.Rd} file under \code{path} and returns, for each documented
-alias, its usage (signature) and a one-line summary taken from the first
-sentence of its description. This is the same information downlit's
-generated links point at -- reftip just re-extracts it locally so it can
-be embedded in the tooltip at build time, without any network access.
+alias, its usage (signature), a one-line summary (first sentence of the
+description), and the topic (Rd file stem) it's documented on.
+}
+\details{
+When an Rd page documents several aliases (e.g. an S3 generic and its
+methods), its \verb{\\\\usage\{\}} block is split on blank lines and each alias is
+matched to the block whose call starts with that alias's name. An alias
+with no matching block falls back to the whole \verb{\\\\usage\{\}} text, with a
+warning.
 }

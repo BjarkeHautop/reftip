@@ -25,9 +25,37 @@ test_that("build_topic_index extracts usage and first-sentence brief", {
         index$foo$brief,
         "Adds a and b together and returns the sum."
     )
+    expect_equal(index$foo$topic, "foo")
 })
 
-test_that("build_topic_index maps every alias of a page to the same entry", {
+test_that("build_topic_index maps every alias of a page to the same brief, and narrows a multi-alias \\usage{} block by name", {
+    dir <- withr::local_tempdir()
+    .write_rd(dir, "print.foo", c(
+        "\\name{print.foo}",
+        "\\alias{print.foo}",
+        "\\alias{foo}",
+        "\\title{Foo methods}",
+        "\\usage{",
+        "foo(x)",
+        "",
+        "\\method{print}{foo}(x, ...)",
+        "}",
+        "\\description{",
+        "Prints a foo object.",
+        "}"
+    ))
+
+    index <- build_topic_index(dir)
+
+    expect_setequal(names(index), c("print.foo", "foo"))
+    expect_equal(index[["print.foo"]]$brief, index[["foo"]]$brief)
+    expect_equal(index[["foo"]]$usage, "foo(x)")
+    expect_equal(index[["print.foo"]]$usage, "print.foo(x, ...)")
+    expect_equal(index[["foo"]]$topic, "print.foo")
+    expect_equal(index[["print.foo"]]$topic, "print.foo")
+})
+
+test_that("an alias with no matching \\usage{} block falls back to the whole block and warns", {
     dir <- withr::local_tempdir()
     .write_rd(dir, "print.foo", c(
         "\\name{print.foo}",
@@ -42,10 +70,9 @@ test_that("build_topic_index maps every alias of a page to the same entry", {
         "}"
     ))
 
-    index <- build_topic_index(dir)
-
-    expect_setequal(names(index), c("print.foo", "foo"))
-    expect_equal(index[["print.foo"]]$brief, index[["foo"]]$brief)
+    expect_warning(index <- build_topic_index(dir), "foo")
+    expect_equal(index[["foo"]]$usage, "print.foo(x, ...)")
+    expect_no_warning(build_topic_index(dir, quiet = TRUE))
 })
 
 test_that("build_topic_index errors without a man/ directory", {

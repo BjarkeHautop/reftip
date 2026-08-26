@@ -1,39 +1,37 @@
-# Post-render step: rewrite the reference links altdoc/Quarto/downlit already
-# produced so each one carries a doxygen-style hover tooltip. This is a plain
-# HTML rewrite over the finished build output, the same strategy
-# DocumenterCodeBlocks.jl uses (see its pipeline.jl) -- it doesn't require
-# hooking into whichever tool (Quarto, mkdocs, docsify, docute) rendered the
-# site, only that the rendered HTML is on disk.
+# Rewrites Quarto's rendered HTML so references to this package's own
+# documented topics link straight to docs/man/<topic>.html and get a hover
+# tooltip, instead of relying on downlit (which can't resolve a local/
+# unpublished package, or a name it can't statically dispatch, e.g. an S3
+# method called by name).
 #
-# What we match: Pandoc's syntax highlighter (skylighting) tags a called
-# function's identifier as `<span class="fu">`, and downlit wraps recognized
-# ones in `<a href="...">`. That combination -- `<span class="fu"><a
-# href="...">name</a></span>` -- is exactly a call-site reference link,
-# whether it resolves locally (docs/man/*.html) or, for a local package
-# without a live pkgdown.yml, out to rdrr.io (see altdoc issue #68). Either
-# way the *name* is enough to look up the local package's own
-# signature/brief, so both cases get a tooltip.
+# Two reference shapes are matched, each optionally already wrapped in a
+# downlit link:
+#  1. A called function inside a fenced code block: Pandoc tags it
+#     `<span class="fu">name</span>` (or "va" for a referenced-but-not-
+#     called value, e.g. an R6 class name).
+#  2. Inline code in prose (`` `foo()` ``): `<code>name()</code>`.
+# Both may already carry an `<a href="...">` from downlit; it's discarded
+# when the name is one of ours, kept otherwise.
 
-.FU_LINK_RE <- "<span class=\"fu\"><a href=\"([^\"]*)\">([^<]*)</a></span>"
+.FU_LINK_RE <- paste0(
+    "<span class=\"(fu|va)\">(?:<a href=\"[^\"]*\">)?([^<]*?)(?:</a>)?</span>",
+    "|",
+    "<code>(?:<a href=\"[^\"]*\">)?([^<]*?)(?:</a>)?</code>"
+)
 
 #' Add hover tooltips to an altdoc site's reference links
 #'
 #' Runs after `altdoc::render_docs()`. Reads the package's own `man/*.Rd`
-#' files to build a name -> signature/summary index (see
-#' [build_topic_index()]), then rewrites every `docs/**/*.html` file,
-#' attaching a doxygen-style hover tooltip to each function-call reference
-#' link already produced by Quarto's `code-link`/downlit. Links that don't
-#' name a documented object in this package are left untouched.
+#' files (see [build_topic_index()]) and rewrites every `docs/**/*.html`
+#' file, attaching a hover tooltip to each reference link that names a
+#' documented object in this package. Everything else is left untouched.
 #'
-#' Idempotent: a file that already carries reftip's marker comment is left
-#' as-is (rerun after a fresh `render_docs()`, not after `add_tooltips()`
-#' itself).
+#' Idempotent: a file that already carries reftip's marker comment is
+#' skipped, so it's safe to rerun after a fresh `render_docs()`.
 #'
 #' @param path Path to the package root.
 #' @param docs_dir Path to the built site. Defaults to `file.path(path,
-#'   "docs")`, which is where `altdoc::render_docs()` always leaves the
-#'   final HTML for all four backends (quarto_website, mkdocs, docsify,
-#'   docute).
+#'   "docs")`.
 #' @param quiet Logical. Suppress progress messages.
 #' @return Invisibly, a list with `files` (how many HTML files were touched)
 #'   and `links` (how many reference links got a tooltip).
@@ -49,7 +47,7 @@ add_tooltips <- function(path = ".", docs_dir = NULL, quiet = FALSE) {
         ), call. = FALSE)
     }
 
-    index <- build_topic_index(path)
+    index <- build_topic_index(path, quiet = quiet)
     if (length(index) == 0) {
         if (!quiet) message("reftip: no documented topics found in man/*.Rd; nothing to do.")
         return(invisible(list(files = 0L, links = 0L)))
@@ -61,9 +59,10 @@ add_tooltips <- function(path = ".", docs_dir = NULL, quiet = FALSE) {
 
     for (f in html_files) {
         html <- paste(readLines(f, warn = FALSE, encoding = "UTF-8"), collapse = "\n")
-        if (grepl(.REFTIP_MARKER, html, fixed = TRUE)) next   # already processed
+        if (grepl(.REFTIP_MARKER, html, fixed = TRUE)) next
 
-        result <- .inject_tooltips_html(html, index)
+        man_href_prefix <- .reftip_man_href_prefix(f, docs_dir)
+        result <- .inject_tooltips_html(html, index, man_href_prefix)
         if (result$n == 0) next
 
         new_html <- result$html
@@ -93,18 +92,20 @@ add_tooltips <- function(path = ".", docs_dir = NULL, quiet = FALSE) {
     invisible(list(files = n_files, links = n_links))
 }
 
-# Single pass over one HTML document: every `.FU_LINK_RE` match whose name
-# resolves in `index` gets its `<a>` tagged with `class="reftip-ref"` and
-# `data-reftip="<id>"`; everything else (including unresolved reference
-# links) is copied through unchanged. `tips` collects one entry per unique
-# resolved name used on the page (id -> {usage, brief}), in first-appearance
-# order -- the page's hidden tooltip payload. Ids rather than raw names
-# avoid any HTML-attribute-escaping concerns for the (rare) operator-like R
-# names.
-#
-# Uses `gregexpr(..., perl = TRUE)` capture positions directly instead of a
-# second `regexec()` pass per match.
-.inject_tooltips_html <- function(html, index) {
+# Relative path from a rendered page to docs/man/, e.g. "man/" from
+# docs/index.html or "../man/" one directory down.
+.reftip_man_href_prefix <- function(file, docs_dir) {
+    man_dir <- fs::path(docs_dir, "man")
+    rel <- fs::path_rel(man_dir, start = fs::path_dir(file))
+    paste0(as.character(rel), "/")
+}
+
+# One pass over an HTML document: every `.FU_LINK_RE` match that resolves in
+# `index` is relinked to docs/man/<topic>.html and tagged with
+# `data-reftip="<id>"`; everything else passes through unchanged. `tips`
+# collects one entry per unique resolved name (id -> {usage, brief, topic}),
+# the page's hidden tooltip payload.
+.inject_tooltips_html <- function(html, index, man_href_prefix = "man/") {
     m <- gregexpr(.FU_LINK_RE, html, perl = TRUE)[[1]]
     if (m[1] == -1) {
         return(list(html = html, n = 0L, tips = list()))
@@ -119,33 +120,48 @@ add_tooltips <- function(path = ".", docs_dir = NULL, quiet = FALSE) {
     pos <- 1L
     pi <- 1L
     n_linked <- 0L
-    tip_ids <- character(0)   # name -> id, assigned on first appearance
-    tips <- list()            # id -> entry
+    tip_ids <- character(0)
+    tips <- list()
 
     for (i in seq_along(starts)) {
         s <- starts[i]
         l <- lens[i]
-        href <- substr(html, cap_starts[i, 1], cap_starts[i, 1] + cap_lens[i, 1] - 1L)
-        name_html <- substr(html, cap_starts[i, 2], cap_starts[i, 2] + cap_lens[i, 2] - 1L)
+        is_block <- cap_starts[i, 1] != 0L   # span (fu/va) vs. inline <code>
+        span_class <- if (is_block) substr(html, cap_starts[i, 1], cap_starts[i, 1] + cap_lens[i, 1] - 1L) else NA
+        name_col <- if (is_block) 2L else 3L
+        name_html <- substr(html, cap_starts[i, name_col], cap_starts[i, name_col] + cap_lens[i, name_col] - 1L)
         name <- .html_unescape(name_html)
+        # strip a trailing call, e.g. "foo(1, 2)" -> "foo", and a wrapping
+        # backtick pair from a literal `` `name<-`() `` in prose
+        lookup <- sub("\\(.*$", "", name, perl = TRUE)
+        lookup <- sub("^`(.*)`$", "\\1", lookup)
 
-        entry <- index[[name]]
+        entry <- index[[lookup]]
 
         pieces[[pi]] <- substr(html, pos, s - 1L)
         pi <- pi + 1L
         if (is.null(entry)) {
             pieces[[pi]] <- substr(html, s, s + l - 1L)
         } else {
-            id <- tip_ids[name]
+            id <- tip_ids[lookup]
             if (is.na(id)) {
                 id <- paste0("t", length(tips) + 1L)
-                tip_ids[name] <- id
+                tip_ids[lookup] <- id
+                entry$name <- lookup
                 tips[[id]] <- entry
             }
-            pieces[[pi]] <- sprintf(
-                '<span class="fu"><a class="reftip-ref" data-reftip="%s" href="%s">%s</a></span>',
-                id, href, name_html
-            )
+            href <- paste0(man_href_prefix, entry$topic, ".html")
+            pieces[[pi]] <- if (is_block) {
+                sprintf(
+                    '<span class="%s"><a class="reftip-ref" data-reftip="%s" href="%s">%s</a></span>',
+                    span_class, id, href, name_html
+                )
+            } else {
+                sprintf(
+                    '<code><a class="reftip-ref" data-reftip="%s" href="%s">%s</a></code>',
+                    id, href, name_html
+                )
+            }
             n_linked <- n_linked + 1L
         }
         pi <- pi + 1L

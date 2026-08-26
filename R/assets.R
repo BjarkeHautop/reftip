@@ -1,19 +1,10 @@
-# Doxygen-style hover tooltip, rendered as a single `position: fixed` div
-# shared by the whole page and positioned by a few lines of vanilla JS.
+# One `position: fixed` tooltip div shared by the whole page, positioned by
+# a few lines of vanilla JS. `position: fixed` (rather than a pure-CSS
+# `:hover` sibling) avoids Quarto's code-block wrapper clipping it via
+# `overflow: auto`.
 #
-# A pure-CSS `:hover` sibling (no JS) was the first attempt, but Quarto's own
-# stylesheet sets `overflow: auto` on the code-block wrapper so long lines
-# scroll horizontally -- and that clips any absolutely-positioned descendant,
-# including a tooltip box nested inside the same `<pre>`. `position: fixed`
-# is positioned relative to the viewport, exactly like the coordinates
-# `getBoundingClientRect()` returns, so it escapes that clipping regardless
-# of which of altdoc's four backends rendered the page. This mirrors why
-# DocumenterCodeBlocks.jl's ref-popup.js does the same thing rather than a
-# CSS-only tooltip (see its assets/ref-popup.{css,js}).
-#
-# Both blocks are marked with an HTML comment so a rerun of `add_tooltips()`
-# can detect an already-processed file and skip it (see `add_tooltips()`),
-# rather than injecting a second payload/script.
+# Marks output with an HTML comment so a rerun of `add_tooltips()` can skip
+# an already-processed file.
 .REFTIP_MARKER <- "<!-- reftip -->"
 
 .reftip_css_block <- function() {
@@ -22,29 +13,29 @@
         "<style>\n",
         ".reftip-float{display:none;position:fixed;z-index:10000;",
         "min-width:220px;max-width:420px;",
-        "background:#1e1e1e;color:#eee;border:1px solid #444;",
+        "background:var(--bs-body-bg,#1e1e1e);color:var(--bs-body-color,#eee);",
+        "border:1px solid var(--bs-border-color,#444);",
         "border-radius:6px;padding:.5em .75em;font-size:.85em;",
         "line-height:1.4;box-shadow:0 4px 14px rgba(0,0,0,.35);",
         "white-space:normal;text-align:left;font-weight:normal;",
         "font-style:normal;}\n",
         ".reftip-float .reftip-sig{display:block;white-space:pre-wrap;",
         "font-family:ui-monospace,SFMono-Regular,Consolas,monospace;",
-        "font-weight:600;color:#9cdcfe;margin-bottom:.35em;}\n",
-        ".reftip-float .reftip-brief{margin:0;color:#ccc;}\n",
+        "font-weight:600;color:var(--bs-link-color,#9cdcfe);margin-bottom:.35em;",
+        # undo Bootstrap's code{} background so this doesn't look boxed in dark mode
+        "background-color:transparent;padding:0;border-radius:0;}\n",
+        ".reftip-float .reftip-brief{margin:0;color:var(--bs-secondary-color,#ccc);}\n",
         "a.reftip-ref{cursor:help;}\n",
         "</style>\n"
     )
 }
 
-# `tips` is a named list, id -> list(usage, brief); rendered once per page as
-# a hidden payload (`ref-popup.js`'s `.ref-tips` idea) that the script below
-# reads by `data-for`. `data-reftip` on each link is the same id, assigned by
-# `.inject_tooltips_html()` in first-appearance order -- ids rather than raw
-# names sidestep HTML-attribute escaping entirely.
+# `tips`: id -> list(usage, brief, name), rendered as a hidden payload the
+# script below reads via `data-for`/`data-reftip`.
 .reftip_payload_html <- function(tips) {
     entries <- vapply(names(tips), function(id) {
         t <- tips[[id]]
-        sig <- if (!is.null(t$usage)) t$usage else id
+        sig <- if (!is.null(t$usage)) t$usage else t$name
         brief_html <- if (!is.null(t$brief)) {
             paste0("<span class=\"reftip-brief\">", .html_escape(t$brief), "</span>")
         } else {

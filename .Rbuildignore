@@ -2,3 +2,6 @@
 ^\.github$
 ^README\.md$
 ^\.lintr$
+^docs$
+^altdoc$
+^_quarto$
