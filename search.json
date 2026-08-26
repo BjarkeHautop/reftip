@@ -130,7 +130,17 @@
     "href": "index.html",
     "title": "reftip",
     "section": "",
-    "text": "Hover tooltips for the function/reference links on an altdoc site. Inspired by DocumenterCodeBlocks.jl.\naltdoc’s quarto_website backend already turns function names in R code into links, via Quarto’s code-link and the downlit package. But downlit can’t link a local dev version or unpublished package, and it doesn’t work on stuff like an S3 method print.animal().\nreftip fixes that. Run it once after altdoc::render_docs():\naltdoc::render_docs()\nreftip::add_tooltips()\nIt only touches references to the package’s own topics; anything else (base R, another package, code it can’t resolve at all) is left exactly as Quarto/downlit rendered it. It targets the quarto_website backend specifically; the other three (mkdocs, docsify, docute) haven’t been tried.\nSee it in action in live demo.\n\n\n\nA generic call like print(x) isn’t resolved, since that needs knowing x’s class at runtime, and reftip only reads man/*.Rd. It doesn’t evaluate any code.\nSame reason obj$method() (R6) isn’t resolved: nothing says which class’s methods to look up.\nAn Rd page with several \\alias{}es sharing one \\usage{} block (an S3 generic plus its methods) shows that whole block in the tooltip, not just the one alias’s line.",
+    "text": "Hover tooltips for the function/reference links on an altdoc site. Inspired by DocumenterCodeBlocks.jl.\naltdoc’s quarto_website backend already turns function names in R code into links, via Quarto’s code-link and the downlit package. But downlit can’t link a local dev version or unpublished package, and it doesn’t work on stuff like an S3 method print.animal().\nreftip fixes that. Run it once after altdoc::render_docs():\naltdoc::render_docs()\nreftip::add_tooltips()\nIt only touches references to the package’s own topics; anything else (base R, another package, code it can’t resolve at all) is left exactly as Quarto/downlit rendered it. It targets the quarto_website backend specifically; the other three (mkdocs, docsify, docute) haven’t been tried.\nSee it in action in live demo.\n\n\naltdown is a pkgdown-styled theme for altdoc sites. alttip shows an example site using altdown and reftip together.\n\n\n\n\nA generic call like print(x) isn’t resolved, since that needs knowing x’s class at runtime, and reftip only reads man/*.Rd. It doesn’t evaluate any code.\nSame reason obj$method() (R6) isn’t resolved: nothing says which class’s methods to look up.\nAn Rd page with several \\alias{}es sharing one \\usage{} block (an S3 generic plus its methods) shows that whole block in the tooltip, not just the one alias’s line.",
+    "crumbs": [
+      "Home"
+    ]
+  },
+  {
+    "objectID": "index.html#see-also",
+    "href": "index.html#see-also",
+    "title": "reftip",
+    "section": "",
+    "text": "altdown is a pkgdown-styled theme for altdoc sites. alttip shows an example site using altdown and reftip together.",
     "crumbs": [
       "Home"
     ]
