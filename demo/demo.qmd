@@ -1,0 +1,36 @@
+---
+title: "Live demo"
+---
+
+The functions below exist only for showcasing. They are injected while
+building the site and are not part of the public API.
+
+## A plain call
+
+```r
+greet("world")
+```
+
+`greet()` is called by name above and here in prose; both get a tooltip
+with its signature and one-line summary.
+
+## An S3 method
+
+`animal()` and `print.animal()` share one Rd page and one `\usage{}` block;
+reftip narrows the tooltip to just the method actually called, something
+downlit alone won't do for an unpublished package.
+
+```r
+rex <- animal("Rex", "woof")
+print.animal(rex)
+```
+
+## A known limitation
+
+Generic dispatch can't be resolved without evaluating the code and checking
+`rex`'s class at runtime, so a plain `print(rex)` stays untouched. See the
+"Known limitations" section of the README.
+
+```r
+print(rex)
+```
