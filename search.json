@@ -4,7 +4,7 @@
     "href": "CITATION.html",
     "title": "Citation",
     "section": "",
-    "text": "Citation\nTo cite package ‘reftip’ in publications use:\n\nHautop B (????). reftip: Hover Tooltips for Reference Links in altdoc Sites. R package version 0.0.0.9000, https://github.com/BjarkeHautop/reftip.",
+    "text": "Citation\nTo cite package ‘reftip’ in publications use:\n\nHautop B (2026). reftip: Hover Tooltips for Reference Links in altdoc Sites. R package version 0.0.0.9000, https://github.com/BjarkeHautop/reftip.",
     "crumbs": [
       "Citation"
     ]
