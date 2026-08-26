@@ -58,7 +58,7 @@
     "href": "demo/demo.html",
     "title": "Live demo",
     "section": "",
-    "text": "The functions below exist only for showcasing. They are injected while building the site and are not part of the public API."
+    "text": "The functions below exist only for showcasing. They are injected while building the site and are not part of the public API. Hover over functions to see it in action!"
   },
   {
     "objectID": "demo/demo.html#a-plain-call",
@@ -86,7 +86,7 @@
     "href": "vignettes/demo.html",
     "title": "Live demo",
     "section": "",
-    "text": "The functions below exist only for showcasing. They are injected while building the site and are not part of the public API.",
+    "text": "The functions below exist only for showcasing. They are injected while building the site and are not part of the public API. Hover over functions to see it in action!",
     "crumbs": [
       "Articles",
       "Live demo"
