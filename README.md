@@ -23,7 +23,7 @@ as Quarto/downlit rendered it. It targets the `quarto_website` backend
 specifically; the other three (mkdocs, docsify, docute) haven't been
 tried.
 
-See it in action in [live demo](/vignettes/demo.html).
+See it in action in [live demo](https://bjarkehautop.github.io/reftip/vignettes/demo.html).
 
 ## Known limitations
 
