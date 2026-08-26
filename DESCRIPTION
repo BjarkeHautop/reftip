@@ -1,6 +1,7 @@
 Package: reftip
 Title: Hover Tooltips for Reference Links in altdoc Sites
 Version: 0.0.0.9000
+Date: 2026-08-27
 Authors@R: person("Bjarke", "Hautop", email = "bjarke.hautop@gmail.com", role = c("aut", "cre"))
 Description: Adds hover tooltips to the function reference links that
     'altdoc' creates in a rendered R code block, showing the target's signature
