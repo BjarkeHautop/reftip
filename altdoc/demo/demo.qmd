@@ -3,7 +3,7 @@ title: "Live demo"
 ---
 
 The functions below exist only for showcasing. They are injected while
-building the site and are not part of the public API.
+building the site and are not part of the public API. Hover over functions to see it in action!
 
 ## A plain call
 
