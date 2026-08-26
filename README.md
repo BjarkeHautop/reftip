@@ -25,6 +25,12 @@ tried.
 
 See it in action in [live demo](https://bjarkehautop.github.io/reftip/vignettes/demo.html).
 
+## See also
+
+[altdown](https://github.com/BjarkeHautop/altdown) is a pkgdown-styled
+theme for altdoc sites. [alttip](https://github.com/bjarkehautop/alttip)
+shows an example site using altdown and reftip together.
+
 ## Known limitations
 
 - A generic call like `print(x)` isn't resolved, since that needs
