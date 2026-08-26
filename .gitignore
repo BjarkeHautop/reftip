@@ -1,0 +1,11 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+*.Rcheck/
+inst/doc
+docs/
+_quarto/
+dev/fixturepkg/docs/
+dev/fixturepkg/_quarto/
+dev/fixturepkg/altdoc/

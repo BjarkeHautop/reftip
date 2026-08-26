@@ -1,0 +1,11 @@
+Package: fixturepkg
+Title: Fixture Package for reftip Development
+Version: 0.0.0.9000
+Authors@R: person("Dev", "Er", email = "dev@example.com", role = c("aut", "cre"))
+Description: A tiny package used to develop and test reftip against real altdoc/downlit output.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+Suggests: knitr, rmarkdown
+VignetteBuilder: knitr
+Config/roxygen2/version: 8.1.0

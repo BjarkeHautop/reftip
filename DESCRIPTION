@@ -1,0 +1,22 @@
+Package: reftip
+Title: Hover Tooltips for Reference Links in altdoc Sites
+Version: 0.0.0.9000
+Authors@R: person("Bjarke", "Hautop", email = "bjarke.hautop@gmail.com", role = c("aut", "cre"))
+Description: altdoc (via Quarto's code-link and the downlit package) already
+    turns function names in rendered R code blocks into links to their
+    documentation. reftip adds the missing piece: doxygen-style hover
+    tooltips on those links, showing the target's signature and a one-line
+    summary, embedded at build time from the package's man/*.Rd files so the
+    site works fully offline. reftip is a post-processing step run after
+    altdoc::render_docs() -- it does not modify altdoc or the linking itself.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+Imports:
+    tools,
+    fs
+Suggests:
+    testthat (>= 3.0.0),
+    withr
+Config/testthat/edition: 3
+Config/roxygen2/version: 8.1.0
