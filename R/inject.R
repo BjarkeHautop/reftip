@@ -70,8 +70,19 @@ add_tooltips <- function(path = ".", docs_dir = NULL, quiet = FALSE) {
             new_html <- sub("</head>", paste0(.reftip_css_block(), "</head>"), new_html, fixed = TRUE)
         }
         body_addition <- paste0(.reftip_payload_html(result$tips), .reftip_script_block())
-        if (grepl("</body>", new_html, fixed = TRUE)) {
-            new_html <- sub("</body>", paste0(body_addition, "</body>"), new_html, fixed = TRUE)
+        # A plain `sub("</body>", ...)` would match the first literal
+        # occurrence anywhere in the raw HTML text, including one that
+        # happens to sit inside a <script> block's own source (e.g. a JS
+        # comment mentioning "</body>"), splicing our payload into the
+        # middle of unrelated script text. The real closing tag is always
+        # the last one, immediately before the document's closing </html>.
+        if (grepl("</body>\\s*</html>\\s*$", new_html, perl = TRUE)) {
+            new_html <- sub(
+                "</body>(\\s*</html>\\s*)$",
+                paste0(body_addition, "</body>\\1"),
+                new_html,
+                perl = TRUE
+            )
         } else {
             new_html <- paste0(new_html, body_addition)
         }
