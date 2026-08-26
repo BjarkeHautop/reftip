@@ -1,0 +1,11 @@
+/*-- scss:rules --*/
+
+/* navbar ==================================================================== */
+
+// `darkly` (the dark theme variant) sets a taller `$navbar-padding-y` than
+// `cosmo` (1rem vs bootstrap's 0.5rem default, which cosmo doesn't
+// override) - pin it so the navbar doesn't visibly grow/shrink when
+// toggling between light and dark mode.
+.navbar {
+  --bs-navbar-padding-y: 0.5rem !important;
+}
