@@ -438,6 +438,14 @@ a.reftip-ref{cursor:help;}
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>reftip<span class="sc">::</span><span class="fu"><a class="reftip-ref" data-reftip="t2" href="man/add_tooltips.html">add_tooltips</a></span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>It only touches references to the package’s own topics; anything else (base R, another package, code it can’t resolve at all) is left exactly as Quarto/downlit rendered it. It targets the <code>quarto_website</code> backend specifically; the other three (mkdocs, docsify, docute) haven’t been tried.</p>
 <p>See it in action in <a href="https://bjarkehautop.github.io/reftip/vignettes/demo.html">live demo</a>.</p>
+<section id="whats-in-the-tooltip" class="level2">
+<h2 class="anchored" data-anchor-id="whats-in-the-tooltip">What’s in the tooltip</h2>
+<ul>
+<li>The matched <code>\usage{}</code> line,</li>
+<li>The first sentence of <code>\description{}</code>.</li>
+</ul>
+<p>If the description’s first sentence runs past 200 characters <code><a class="reftip-ref" data-reftip="t2" href="man/add_tooltips.html">add_tooltips()</a></code> warns, naming the Rd file, so you know to shorten it. Pass <code>quiet = TRUE</code> to suppress.</p>
+</section>
 <section id="see-also" class="level2">
 <h2 class="anchored" data-anchor-id="see-also">See also</h2>
 <p><a href="https://github.com/BjarkeHautop/altdown">altdown</a> is a pkgdown-styled theme for altdoc sites. <a href="https://github.com/bjarkehautop/alttip">alttip</a> shows an example site using altdown and reftip together.</p>
@@ -873,7 +881,7 @@ a.reftip-ref{cursor:help;}
 
 
 
-<div class="reftip-payload" hidden><div class="reftip-tip" data-for="t1"><code class="reftip-sig">print.animal(x, ...)</code><span class="reftip-brief">A minimal S3 class.</span></div><div class="reftip-tip" data-for="t2"><code class="reftip-sig">add_tooltips(path = &quot;.&quot;, docs_dir = NULL, quiet = FALSE)</code><span class="reftip-brief">Runs after altdoc::render_docs().</span></div></div>
+<div class="reftip-payload" hidden><div class="reftip-tip" data-for="t1"><code class="reftip-sig">print.animal(x, ...)</code><span class="reftip-brief">A minimal S3 class.</span></div><div class="reftip-tip" data-for="t2"><code class="reftip-sig">add_tooltips(path = &quot;.&quot;, docs_dir = NULL, quiet = FALSE)</code><span class="reftip-brief">Run after you build docs with altdoc::render_docs().</span></div></div>
 <script>
 (function(){
   var payload = document.currentScript.previousElementSibling;
