@@ -6,9 +6,10 @@ Hover tooltips for the function/reference links on an
 
 altdoc's `quarto_website` backend already turns function names in R code
 into links, via Quarto's `code-link` and the
-[downlit](https://downlit.r-lib.org/) package. But downlit can't link a
-local dev version or unpublished package, and it doesn't work on stuff
-like an S3 method `print.animal()`.
+[downlit](https://downlit.r-lib.org/) package. But downlit doesn't know
+this package is unpublished. It still adds a link, just to a guessed
+CRAN/rdrr.io URL that doesn't exist. And it won't link an S3 method
+called by name, like `print.animal()`, at all.
 
 reftip fixes that. Run it once after `altdoc::render_docs()`:
 
