@@ -80,6 +80,26 @@ test_that("build_topic_index errors without a man/ directory", {
     expect_error(build_topic_index(dir), "man/")
 })
 
+test_that("a description with no sentence boundary within 200 characters warns and clips with '...'", {
+    dir <- withr::local_tempdir()
+    long_text <- paste(rep("word", 60), collapse = " ")
+    .write_rd(dir, "foo", c(
+        "\\name{foo}",
+        "\\alias{foo}",
+        "\\title{Foo}",
+        "\\usage{",
+        "foo()",
+        "}",
+        "\\description{",
+        long_text,
+        "}"
+    ))
+
+    expect_warning(index <- build_topic_index(dir), "truncated mid-sentence")
+    expect_true(endsWith(index$foo$brief, "..."))
+    expect_no_warning(build_topic_index(dir, quiet = TRUE))
+})
+
 test_that("a topic with no description prose has a NULL brief", {
     dir <- withr::local_tempdir()
     .write_rd(dir, "bar", c(

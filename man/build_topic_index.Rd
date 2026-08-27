@@ -9,8 +9,9 @@ build_topic_index(path = ".", quiet = FALSE)
 \arguments{
 \item{path}{Path to the package root (must contain a \verb{man/} directory).}
 
-\item{quiet}{Logical. Suppress the warning issued when a \verb{\\\\usage\{\}} block
-couldn't be narrowed to one alias.}
+\item{quiet}{Logical. Suppress the warnings issued when a \verb{\\\\usage\{\}} block
+couldn't be narrowed to one alias, or when a tooltip brief had to be
+truncated mid-sentence.}
 }
 \value{
 A named list, one entry per alias, each holding \code{usage}, \code{brief}

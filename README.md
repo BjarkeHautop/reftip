@@ -25,6 +25,14 @@ tried.
 
 See it in action in [live demo](https://bjarkehautop.github.io/reftip/vignettes/demo.html).
 
+## What's in the tooltip
+
+- The matched `\usage{}` line,
+- The first sentence of `\description{}`.
+
+If the description's first sentence runs past 200 characters `add_tooltips()` warns, naming the Rd file, so you know to
+shorten it. Pass `quiet = TRUE` to suppress.
+
 ## See also
 
 [altdown](https://github.com/BjarkeHautop/altdown) is a pkgdown-styled

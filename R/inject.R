@@ -21,7 +21,7 @@
 
 #' Add hover tooltips to an altdoc site's reference links
 #'
-#' Runs after `altdoc::render_docs()`. Reads the package's own `man/*.Rd`
+#' Run after you build docs with `altdoc::render_docs()`. Reads the package's own `man/*.Rd`
 #' files (see [build_topic_index()]) and rewrites every `docs/**/*.html`
 #' file, attaching a hover tooltip to each reference link that names a
 #' documented object in this package. Everything else is left untouched.
@@ -41,15 +41,22 @@ add_tooltips <- function(path = ".", docs_dir = NULL, quiet = FALSE) {
         docs_dir <- fs::path_join(c(path, "docs"))
     }
     if (!fs::dir_exists(docs_dir)) {
-        stop(sprintf(
-            "No built site found at '%s'. Run altdoc::render_docs() first.",
-            docs_dir
-        ), call. = FALSE)
+        stop(
+            sprintf(
+                "No built site found at '%s'. Run altdoc::render_docs() first.",
+                docs_dir
+            ),
+            call. = FALSE
+        )
     }
 
     index <- build_topic_index(path, quiet = quiet)
     if (length(index) == 0) {
-        if (!quiet) message("reftip: no documented topics found in man/*.Rd; nothing to do.")
+        if (!quiet) {
+            message(
+                "reftip: no documented topics found in man/*.Rd; nothing to do."
+            )
+        }
         return(invisible(list(files = 0L, links = 0L)))
     }
 
@@ -58,18 +65,33 @@ add_tooltips <- function(path = ".", docs_dir = NULL, quiet = FALSE) {
     n_links <- 0L
 
     for (f in html_files) {
-        html <- paste(readLines(f, warn = FALSE, encoding = "UTF-8"), collapse = "\n")
-        if (grepl(.REFTIP_MARKER, html, fixed = TRUE)) next
+        html <- paste(
+            readLines(f, warn = FALSE, encoding = "UTF-8"),
+            collapse = "\n"
+        )
+        if (grepl(.REFTIP_MARKER, html, fixed = TRUE)) {
+            next
+        }
 
         man_href_prefix <- .reftip_man_href_prefix(f, docs_dir)
         result <- .inject_tooltips_html(html, index, man_href_prefix)
-        if (result$n == 0) next
+        if (result$n == 0) {
+            next
+        }
 
         new_html <- result$html
         if (grepl("</head>", new_html, fixed = TRUE)) {
-            new_html <- sub("</head>", paste0(.reftip_css_block(), "</head>"), new_html, fixed = TRUE)
+            new_html <- sub(
+                "</head>",
+                paste0(.reftip_css_block(), "</head>"),
+                new_html,
+                fixed = TRUE
+            )
         }
-        body_addition <- paste0(.reftip_payload_html(result$tips), .reftip_script_block())
+        body_addition <- paste0(
+            .reftip_payload_html(result$tips),
+            .reftip_script_block()
+        )
         # A plain `sub("</body>", ...)` would match the first literal
         # occurrence anywhere in the raw HTML text, including one that
         # happens to sit inside a <script> block's own source (e.g. a JS
@@ -95,8 +117,10 @@ add_tooltips <- function(path = ".", docs_dir = NULL, quiet = FALSE) {
     if (!quiet) {
         message(sprintf(
             "reftip: added tooltips to %d reference link%s across %d file%s.",
-            n_links, if (n_links == 1) "" else "s",
-            n_files, if (n_files == 1) "" else "s"
+            n_links,
+            if (n_links == 1) "" else "s",
+            n_files,
+            if (n_files == 1) "" else "s"
         ))
     }
 
@@ -137,10 +161,22 @@ add_tooltips <- function(path = ".", docs_dir = NULL, quiet = FALSE) {
     for (i in seq_along(starts)) {
         s <- starts[i]
         l <- lens[i]
-        is_block <- cap_starts[i, 1] != 0L   # span (fu/va) vs. inline <code>
-        span_class <- if (is_block) substr(html, cap_starts[i, 1], cap_starts[i, 1] + cap_lens[i, 1] - 1L) else NA
+        is_block <- cap_starts[i, 1] != 0L # span (fu/va) vs. inline <code>
+        span_class <- if (is_block) {
+            substr(
+                html,
+                cap_starts[i, 1],
+                cap_starts[i, 1] + cap_lens[i, 1] - 1L
+            )
+        } else {
+            NA
+        }
         name_col <- if (is_block) 2L else 3L
-        name_html <- substr(html, cap_starts[i, name_col], cap_starts[i, name_col] + cap_lens[i, name_col] - 1L)
+        name_html <- substr(
+            html,
+            cap_starts[i, name_col],
+            cap_starts[i, name_col] + cap_lens[i, name_col] - 1L
+        )
         name <- .html_unescape(name_html)
         # strip a trailing call, e.g. "foo(1, 2)" -> "foo", and a wrapping
         # backtick pair from a literal `` `name<-`() `` in prose
@@ -165,12 +201,17 @@ add_tooltips <- function(path = ".", docs_dir = NULL, quiet = FALSE) {
             pieces[[pi]] <- if (is_block) {
                 sprintf(
                     '<span class="%s"><a class="reftip-ref" data-reftip="%s" href="%s">%s</a></span>',
-                    span_class, id, href, name_html
+                    span_class,
+                    id,
+                    href,
+                    name_html
                 )
             } else {
                 sprintf(
                     '<code><a class="reftip-ref" data-reftip="%s" href="%s">%s</a></code>',
-                    id, href, name_html
+                    id,
+                    href,
+                    name_html
                 )
             }
             n_linked <- n_linked + 1L

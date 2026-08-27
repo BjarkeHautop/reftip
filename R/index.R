@@ -11,8 +11,9 @@
 #' warning.
 #'
 #' @param path Path to the package root (must contain a `man/` directory).
-#' @param quiet Logical. Suppress the warning issued when a `\\usage{}` block
-#'   couldn't be narrowed to one alias.
+#' @param quiet Logical. Suppress the warnings issued when a `\\usage{}` block
+#'   couldn't be narrowed to one alias, or when a tooltip brief had to be
+#'   truncated mid-sentence.
 #' @return A named list, one entry per alias, each holding `usage`, `brief`
 #'   (character or `NULL`), and `topic`.
 #' @export
@@ -45,7 +46,8 @@ build_topic_index <- function(path = ".", quiet = FALSE) {
         names(usage_by_name) <- vapply(usage_blocks, .rd_usage_leading_name, character(1))
 
         description <- .rd_section_text(rd, tags, "\\description")
-        brief <- .first_sentence(description)
+        sentence <- .first_sentence(description)
+        brief <- sentence$text
 
         unmatched <- setdiff(aliases, names(usage_by_name))
         if (!quiet && length(aliases) > 1 && length(unmatched) > 0) {
@@ -54,6 +56,12 @@ build_topic_index <- function(path = ".", quiet = FALSE) {
                 basename(rd_file), length(aliases),
                 paste(sprintf("'%s'", unmatched), collapse = ", "),
                 if (length(unmatched) == 1) "it" else "them"
+            ), call. = FALSE)
+        }
+        if (!quiet && sentence$clipped) {
+            warning(sprintf(
+                "reftip: the \\description{} for '%s' has no sentence boundary within 200 characters; the tooltip brief is truncated mid-sentence. Start \\description{} with one short summary sentence.",
+                basename(rd_file)
             ), call. = FALSE)
         }
 

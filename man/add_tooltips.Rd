@@ -18,7 +18,7 @@ Invisibly, a list with \code{files} (how many HTML files were touched)
 and \code{links} (how many reference links got a tooltip).
 }
 \description{
-Runs after \code{altdoc::render_docs()}. Reads the package's own \verb{man/*.Rd}
+Run after you build docs with \code{altdoc::render_docs()}. Reads the package's own \verb{man/*.Rd}
 files (see \code{\link[=build_topic_index]{build_topic_index()}}) and rewrites every \verb{docs/**/*.html}
 file, attaching a hover tooltip to each reference link that names a
 documented object in this package. Everything else is left untouched.
