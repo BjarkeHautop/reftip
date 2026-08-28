@@ -431,20 +431,20 @@ a.reftip-ref{cursor:help;}
 
 <section id="reftip" class="level1">
 <h1>reftip</h1>
-<p>reftip provides hover tooltips for function/reference links, and more robust handling of these links, for an <a href="https://github.com/etiennebacher/altdoc">altdoc</a> site. Inspired by <a href="https://fredrikekre.github.io/DocumenterCodeBlocks.jl/dev/">DocumenterCodeBlocks.jl</a>.</p>
-<p>To use it, simply just call <code>reftip::add_tooltips()</code> after you render your site:</p>
+<p>Hover tooltips for the function/reference links on an <a href="https://github.com/etiennebacher/altdoc">altdoc</a> site. Inspired by <a href="https://fredrikekre.github.io/DocumenterCodeBlocks.jl/dev/">DocumenterCodeBlocks.jl</a>.</p>
+<p>altdoc’s <code>quarto_website</code> backend already turns function names in R code into links, via Quarto’s <code>code-link</code> and the <a href="https://downlit.r-lib.org/">downlit</a> package. But downlit doesn’t know this package is unpublished. It still adds a link, just to a guessed CRAN/rdrr.io URL that doesn’t exist. And it won’t link an S3 method called by name, like <code><a class="reftip-ref" data-reftip="t1" href="man/animal.html">print.animal()</a></code>, at all.</p>
+<p>reftip fixes that. Run it once after <code>altdoc::render_docs()</code>:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>altdoc<span class="sc">::</span><span class="fu">render_docs</span>()</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>reftip<span class="sc">::</span><span class="fu"><a class="reftip-ref" data-reftip="t1" href="man/add_tooltips.html">add_tooltips</a></span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<section id="installation" class="level2">
-<h2 class="anchored" data-anchor-id="installation">Installation</h2>
-<p>Install from GitHub:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>pak<span class="sc">::</span><span class="fu">pak</span>(<span class="st">"https://github.com/BjarkeHautop/altdown"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</section>
-<section id="what-it-does" class="level2">
-<h2 class="anchored" data-anchor-id="what-it-does">What it does</h2>
-<p>For any function defined in your package reftip adds a preview on hover showing the function signature, and the first sentence of <code>\description{}</code>.</p>
-<p>It targets the <code>quarto_website</code> backend of altdoc specifically; the other three (mkdocs, docsify, docute) haven’t been tried.</p>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>reftip<span class="sc">::</span><span class="fu"><a class="reftip-ref" data-reftip="t2" href="man/add_tooltips.html">add_tooltips</a></span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>It only touches references to the package’s own topics; anything else (base R, another package, code it can’t resolve at all) is left exactly as Quarto/downlit rendered it. It targets the <code>quarto_website</code> backend specifically; the other three (mkdocs, docsify, docute) haven’t been tried.</p>
 <p>See it in action in <a href="https://bjarkehautop.github.io/reftip/vignettes/demo.html">live demo</a>.</p>
+<section id="whats-in-the-tooltip" class="level2">
+<h2 class="anchored" data-anchor-id="whats-in-the-tooltip">What’s in the tooltip</h2>
+<ul>
+<li>The matched <code>\usage{}</code> line,</li>
+<li>The first sentence of <code>\description{}</code>.</li>
+</ul>
+<p>If the description’s first sentence runs past 200 characters <code><a class="reftip-ref" data-reftip="t2" href="man/add_tooltips.html">add_tooltips()</a></code> warns, naming the Rd file, so you know to shorten it. Pass <code>quiet = TRUE</code> to suppress.</p>
 </section>
 <section id="see-also" class="level2">
 <h2 class="anchored" data-anchor-id="see-also">See also</h2>
@@ -881,7 +881,7 @@ a.reftip-ref{cursor:help;}
 
 
 
-<div class="reftip-payload" hidden><div class="reftip-tip" data-for="t1"><code class="reftip-sig">add_tooltips(path = &quot;.&quot;, docs_dir = NULL, quiet = FALSE)</code><span class="reftip-brief">Run after you build docs with altdoc::render_docs().</span></div></div>
+<div class="reftip-payload" hidden><div class="reftip-tip" data-for="t1"><code class="reftip-sig">print.animal(x, ...)</code><span class="reftip-brief">A minimal S3 class.</span></div><div class="reftip-tip" data-for="t2"><code class="reftip-sig">add_tooltips(path = &quot;.&quot;, docs_dir = NULL, quiet = FALSE)</code><span class="reftip-brief">Run after you build docs with altdoc::render_docs().</span></div></div>
 <script>
 (function(){
   var payload = document.currentScript.previousElementSibling;

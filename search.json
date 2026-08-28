@@ -130,27 +130,17 @@
     "href": "index.html",
     "title": "reftip",
     "section": "",
-    "text": "reftip provides hover tooltips for function/reference links, and more robust handling of these links, for an altdoc site. Inspired by DocumenterCodeBlocks.jl.\nTo use it, simply just call reftip::add_tooltips() after you render your site:\naltdoc::render_docs()\nreftip::add_tooltips()\n\n\nInstall from GitHub:\npak::pak(\"https://github.com/BjarkeHautop/altdown\")\n\n\n\nFor any function defined in your package reftip adds a preview on hover showing the function signature, and the first sentence of \\description{}.\nIt targets the quarto_website backend of altdoc specifically; the other three (mkdocs, docsify, docute) haven’t been tried.\nSee it in action in live demo.\n\n\n\naltdown is a pkgdown-styled theme for altdoc sites. alttip shows an example site using altdown and reftip together.\n\n\n\n\nA generic call like print(x) isn’t resolved, since that needs knowing x’s class at runtime, and reftip only reads man/*.Rd. It doesn’t evaluate any code.\nSame reason obj$method() (R6) isn’t resolved: nothing says which class’s methods to look up.\nAn Rd page with several \\alias{}es sharing one \\usage{} block (an S3 generic plus its methods) shows that whole block in the tooltip, not just the one alias’s line.",
+    "text": "Hover tooltips for the function/reference links on an altdoc site. Inspired by DocumenterCodeBlocks.jl.\naltdoc’s quarto_website backend already turns function names in R code into links, via Quarto’s code-link and the downlit package. But downlit doesn’t know this package is unpublished. It still adds a link, just to a guessed CRAN/rdrr.io URL that doesn’t exist. And it won’t link an S3 method called by name, like print.animal(), at all.\nreftip fixes that. Run it once after altdoc::render_docs():\naltdoc::render_docs()\nreftip::add_tooltips()\nIt only touches references to the package’s own topics; anything else (base R, another package, code it can’t resolve at all) is left exactly as Quarto/downlit rendered it. It targets the quarto_website backend specifically; the other three (mkdocs, docsify, docute) haven’t been tried.\nSee it in action in live demo.\n\n\n\nThe matched \\usage{} line,\nThe first sentence of \\description{}.\n\nIf the description’s first sentence runs past 200 characters add_tooltips() warns, naming the Rd file, so you know to shorten it. Pass quiet = TRUE to suppress.\n\n\n\naltdown is a pkgdown-styled theme for altdoc sites. alttip shows an example site using altdown and reftip together.\n\n\n\n\nA generic call like print(x) isn’t resolved, since that needs knowing x’s class at runtime, and reftip only reads man/*.Rd. It doesn’t evaluate any code.\nSame reason obj$method() (R6) isn’t resolved: nothing says which class’s methods to look up.\nAn Rd page with several \\alias{}es sharing one \\usage{} block (an S3 generic plus its methods) shows that whole block in the tooltip, not just the one alias’s line.",
     "crumbs": [
       "Home"
     ]
   },
   {
-    "objectID": "index.html#installation",
-    "href": "index.html#installation",
+    "objectID": "index.html#whats-in-the-tooltip",
+    "href": "index.html#whats-in-the-tooltip",
     "title": "reftip",
     "section": "",
-    "text": "Install from GitHub:\npak::pak(\"https://github.com/BjarkeHautop/altdown\")",
-    "crumbs": [
-      "Home"
-    ]
-  },
-  {
-    "objectID": "index.html#what-it-does",
-    "href": "index.html#what-it-does",
-    "title": "reftip",
-    "section": "",
-    "text": "For any function defined in your package reftip adds a preview on hover showing the function signature, and the first sentence of \\description{}.\nIt targets the quarto_website backend of altdoc specifically; the other three (mkdocs, docsify, docute) haven’t been tried.\nSee it in action in live demo.",
+    "text": "The matched \\usage{} line,\nThe first sentence of \\description{}.\n\nIf the description’s first sentence runs past 200 characters add_tooltips() warns, naming the Rd file, so you know to shorten it. Pass quiet = TRUE to suppress.",
     "crumbs": [
       "Home"
     ]
