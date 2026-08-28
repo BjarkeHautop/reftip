@@ -394,15 +394,20 @@ a.reftip-ref{cursor:help;}
 
 
 
-<section id="add-hover-tooltips-to-an-altdoc-sites-reference-links" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="add-hover-tooltips-to-an-altdoc-sites-reference-links">Add hover tooltips to an altdoc site’s reference links</h2>
+<section id="add-hover-tooltips-to-an-altdoc-or-pkgdown-sites-reference-links" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="add-hover-tooltips-to-an-altdoc-or-pkgdown-sites-reference-links">Add hover tooltips to an altdoc or pkgdown site’s reference links</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>Run after you build docs with <code>altdoc::render_docs()</code>. Reads the package’s own <code style="white-space: pre;">man/*.Rd</code> files (see <code><a class="reftip-ref" data-reftip="t1" href="./build_topic_index.html">build_topic_index()</a></code>) and rewrites every <code style="white-space: pre;">docs/**/*.html</code> file, attaching a hover tooltip to each reference link that names a documented object in this package. Everything else is left untouched.</p>
+<p>Run after you build docs with <code>altdoc::render_docs()</code> or <code>pkgdown::build_site()</code>. Reads the package’s own <code style="white-space: pre;">man/*.Rd</code> files (see <code><a class="reftip-ref" data-reftip="t1" href="./build_topic_index.html">build_topic_index()</a></code>) and rewrites every <code style="white-space: pre;">docs/**/*.html</code> file, attaching a hover tooltip to each reference link that names a documented object in this package. Everything else is left untouched.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
-<pre><code class="language-R">add_tooltips(path = ".", docs_dir = NULL, quiet = FALSE)
+<pre><code class="language-R">add_tooltips(
+  path = ".",
+  docs_dir = NULL,
+  site = c("auto", "altdoc", "pkgdown"),
+  quiet = FALSE
+)
 </code></pre>
 </section>
 <section id="arguments" class="level3">
@@ -426,6 +431,14 @@ Path to the built site. Defaults to <code>file.path(path, “docs”)</code>.
 </tr>
 <tr>
 <td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="site">site</code>
+</td>
+<td>
+One of <code>“auto”</code> (default), <code>“altdoc”</code>, or <code>“pkgdown”</code>. <code>“auto”</code> detects the site type from <code>docs_dir</code>’s layout: a <code style="white-space: pre;">reference/</code> subdirectory means pkgdown, a <code style="white-space: pre;">man/</code> subdirectory means altdoc.
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
 <code id="quiet">quiet</code>
 </td>
 <td>
@@ -436,7 +449,8 @@ Logical. Suppress progress messages.
 </section>
 <section id="details" class="level3">
 <h3 class="anchored" data-anchor-id="details">Details</h3>
-<p>Idempotent: a file that already carries reftip’s marker comment is skipped, so it’s safe to rerun after a fresh <code>render_docs()</code>.</p>
+<p>On an altdoc site, downlit can’t resolve the package’s own (local, unpublished) functions, so reftip also relinks each reference straight to <code style="white-space: pre;">docs/man/&lt;topic&gt;.html</code>. On a pkgdown site, downlit already resolves these correctly (it builds against the installed local package), so reftip leaves the existing link alone and only attaches the tooltip; it builds a link itself only for a name downlit left unlinked (e.g.&nbsp;an S3 method called by name).</p>
+<p>Idempotent: a file that already carries reftip’s marker comment is skipped, so it’s safe to rerun after a fresh build.</p>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
@@ -865,7 +879,7 @@ Logical. Suppress progress messages.
 
 
 
-<div class="reftip-payload" hidden><div class="reftip-tip" data-for="t1"><code class="reftip-sig">build_topic_index(path = &quot;.&quot;, quiet = FALSE)</code><span class="reftip-brief">Parses every man/*.Rd file under path and returns, for each documented alias, its usage (signature), a one-line summary (first sentence of the description), and the topic (Rd file stem) it's documente...</span></div></div>
+<div class="reftip-payload" hidden><div class="reftip-tip" data-for="t1"><code class="reftip-sig">build_topic_index(path = &quot;.&quot;, quiet = FALSE)</code><span class="reftip-brief">Parses every man/*.Rd file under path and returns, for each documented alias, its usage, a one-line summary, and the topic it's documented on.</span></div></div>
 <script>
 (function(){
   var payload = document.currentScript.previousElementSibling;

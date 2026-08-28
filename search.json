@@ -4,7 +4,7 @@
     "href": "CITATION.html",
     "title": "Citation",
     "section": "",
-    "text": "Citation\nTo cite package ‘reftip’ in publications use:\n\nHautop B (2026). reftip: Hover Tooltips for Reference Links in altdoc Sites. R package version 0.0.0.9000, https://github.com/BjarkeHautop/reftip.",
+    "text": "Citation\nTo cite package ‘reftip’ in publications use:\n\nHautop B (2026). reftip: Hover Tooltips for Reference Links in altdoc and pkgdown Sites. R package version 0.0.0.9000, https://github.com/BjarkeHautop/reftip.",
     "crumbs": [
       "Citation"
     ]
@@ -14,7 +14,7 @@
     "href": "man/build_topic_index.html",
     "title": "reftip",
     "section": "",
-    "text": "Parses every man/*.Rd file under path and returns, for each documented alias, its usage (signature), a one-line summary (first sentence of the description), and the topic (Rd file stem) it’s documented on.\n\n\n\nbuild_topic_index(path = \".\", quiet = FALSE)\n\n\n\n\n\n\n\npath\n\n\nPath to the package root (must contain a man/ directory).\n\n\n\n\nquiet\n\n\nLogical. Suppress the warnings issued when a \\usage{} block couldn’t be narrowed to one alias, or when a tooltip brief had to be truncated mid-sentence.\n\n\n\n\n\n\nWhen an Rd page documents several aliases (e.g. an S3 generic and its methods), its \\usage{} block is split on blank lines and each alias is matched to the block whose call starts with that alias’s name. An alias with no matching block falls back to the whole \\usage{} text, with a warning.\n\n\n\nA named list, one entry per alias, each holding usage, brief (character or NULL), and topic.",
+    "text": "Parses every man/*.Rd file under path and returns, for each documented alias, its usage, a one-line summary, and the topic it’s documented on.\n\n\n\nbuild_topic_index(path = \".\", quiet = FALSE)\n\n\n\n\n\n\n\npath\n\n\nPath to the package root (must contain a man/ directory).\n\n\n\n\nquiet\n\n\nLogical. Suppress the warnings issued when a \\usage{} block couldn’t be narrowed to one alias, or when a tooltip brief had to be truncated mid-word.\n\n\n\n\n\n\nWhen an Rd page documents several aliases (e.g. an S3 generic and its methods), its \\usage{} block is split on blank lines and each alias is matched to the block whose call starts with that alias’s name. An alias with no matching block falls back to the whole \\usage{} text, with a warning.\n\n\n\nA named list, one entry per alias, each holding usage, brief (character or NULL), and topic.",
     "crumbs": [
       "Reference",
       "build_topic_index"
@@ -25,7 +25,7 @@
     "href": "man/build_topic_index.html#build-a-reference-index-from-a-packages-rd-files",
     "title": "reftip",
     "section": "",
-    "text": "Parses every man/*.Rd file under path and returns, for each documented alias, its usage (signature), a one-line summary (first sentence of the description), and the topic (Rd file stem) it’s documented on.\n\n\n\nbuild_topic_index(path = \".\", quiet = FALSE)\n\n\n\n\n\n\n\npath\n\n\nPath to the package root (must contain a man/ directory).\n\n\n\n\nquiet\n\n\nLogical. Suppress the warnings issued when a \\usage{} block couldn’t be narrowed to one alias, or when a tooltip brief had to be truncated mid-sentence.\n\n\n\n\n\n\nWhen an Rd page documents several aliases (e.g. an S3 generic and its methods), its \\usage{} block is split on blank lines and each alias is matched to the block whose call starts with that alias’s name. An alias with no matching block falls back to the whole \\usage{} text, with a warning.\n\n\n\nA named list, one entry per alias, each holding usage, brief (character or NULL), and topic.",
+    "text": "Parses every man/*.Rd file under path and returns, for each documented alias, its usage, a one-line summary, and the topic it’s documented on.\n\n\n\nbuild_topic_index(path = \".\", quiet = FALSE)\n\n\n\n\n\n\n\npath\n\n\nPath to the package root (must contain a man/ directory).\n\n\n\n\nquiet\n\n\nLogical. Suppress the warnings issued when a \\usage{} block couldn’t be narrowed to one alias, or when a tooltip brief had to be truncated mid-word.\n\n\n\n\n\n\nWhen an Rd page documents several aliases (e.g. an S3 generic and its methods), its \\usage{} block is split on blank lines and each alias is matched to the block whose call starts with that alias’s name. An alias with no matching block falls back to the whole \\usage{} text, with a warning.\n\n\n\nA named list, one entry per alias, each holding usage, brief (character or NULL), and topic.",
     "crumbs": [
       "Reference",
       "build_topic_index"
@@ -36,7 +36,7 @@
     "href": "man/animal.html",
     "title": "reftip",
     "section": "",
-    "text": "A minimal S3 class. Exists only to demo the case downlit can’t resolve on its own: a call to an S3 method written out by its full dotted name.\n\n\n\nanimal(name, sound)\n\n## S3 method for class 'animal'\nprint(x, ...)\n\n\n\n\n\n\n\nname\n\n\nCharacter. The animal’s name.\n\n\n\n\nsound\n\n\nCharacter. The sound it makes.\n\n\n\n\nx\n\n\nAn ‘animal’ object.\n\n\n\n\n…\n\n\nUnused.\n\n\n\n\n\n\nAn object of class ‘animal’.",
+    "text": "A minimal S3 class. Exists only to demo the case downlit can’t resolve on its own: a call to an S3 method written out by its full dotted name.\n\nanimal(name, sound)\n\n## S3 method for class 'animal'\nprint(x, ...)\n\n\n\n\n\nname\n\n\nCharacter. The animal’s name.\n\n\n\n\nsound\n\n\nCharacter. The sound it makes.\n\n\n\n\nx\n\n\nAn ‘animal’ object.\n\n\n\n\n…\n\n\nUnused.\n\n\n\nAn object of class ‘animal’.\n\n\nlibrary(\"reftip\")\n\nrex &lt;- animal(\"Rex\", \"woof\")\nprint.animal(rex)",
     "crumbs": [
       "Reference",
       "animal"
@@ -47,39 +47,61 @@
     "href": "man/animal.html#an-animal",
     "title": "reftip",
     "section": "",
-    "text": "A minimal S3 class. Exists only to demo the case downlit can’t resolve on its own: a call to an S3 method written out by its full dotted name.\n\n\n\nanimal(name, sound)\n\n## S3 method for class 'animal'\nprint(x, ...)\n\n\n\n\n\n\n\nname\n\n\nCharacter. The animal’s name.\n\n\n\n\nsound\n\n\nCharacter. The sound it makes.\n\n\n\n\nx\n\n\nAn ‘animal’ object.\n\n\n\n\n…\n\n\nUnused.\n\n\n\n\n\n\nAn object of class ‘animal’.",
+    "text": "A minimal S3 class. Exists only to demo the case downlit can’t resolve on its own: a call to an S3 method written out by its full dotted name.\n\nanimal(name, sound)\n\n## S3 method for class 'animal'\nprint(x, ...)\n\n\n\n\n\nname\n\n\nCharacter. The animal’s name.\n\n\n\n\nsound\n\n\nCharacter. The sound it makes.\n\n\n\n\nx\n\n\nAn ‘animal’ object.\n\n\n\n\n…\n\n\nUnused.\n\n\n\nAn object of class ‘animal’.\n\n\nlibrary(\"reftip\")\n\nrex &lt;- animal(\"Rex\", \"woof\")\nprint.animal(rex)",
     "crumbs": [
       "Reference",
       "animal"
     ]
   },
   {
-    "objectID": "demo/demo.html",
-    "href": "demo/demo.html",
-    "title": "Live demo",
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "reftip",
     "section": "",
-    "text": "The functions below exist only for showcasing. They are injected while building the site and are not part of the public API. Hover over functions to see it in action!"
+    "text": "Hover tooltips for the function/reference links on an pkgdown or altdoc site. Inspired by DocumenterCodeBlocks.jl.\nBuild your docs like normal via pkgdown::build_site() or altdoc::render_docs() and then run:\nreftip::add_tooltips()\nIt auto-detects which of the two built the site; pass site = \"altdoc\" or site = \"pkgdown\" explicitly if detection is ambiguous. Either way the tooltip, only touches references to the package’s own topics; anything else (base R, another package, code it can’t resolve) is left alone.\nSee it in action in live demo.\n\n\nInstall from GitHub:\npak:pak(\"https://github.com/BjarkeHautop/reftip\")\n\n\n\nBoth site types can be built from this repo using a couple of throwaway demo functions (see demo/demo.R) that exist only to show off the tooltips:\npkgload::load_all()\n\n# altdoc\nsource(\"altdoc/build-site.R\")\nbuild_site()\n\n# pkgdown\nsource(\"pkgdown/build-site.R\")\nbuild_site()\nOpen docs/index.html (altdoc) or docs-pkgdown/index.html (pkgdown) afterward and hover over functions to see it in action.\n\n\n\n\nThe matched \\usage{} line,\nThe first sentence of \\description{}.\n\nIf the description’s first sentence runs past 200 characters add_tooltips() warns, naming the Rd file, so you know to shorten it. Pass quiet = TRUE to suppress.\n\n\n\n\nA generic call like print(x) isn’t resolved, since that needs knowing x’s class at runtime, and reftip only reads man/*.Rd. It doesn’t evaluate any code.\nSame reason obj$method() (R6) isn’t resolved: nothing says which class’s methods to look up.\nAn Rd page with several \\alias{}es sharing one \\usage{} block (an S3 generic plus its methods) shows that whole block in the tooltip, not just the one alias’s line.",
+    "crumbs": [
+      "Home"
+    ]
   },
   {
-    "objectID": "demo/demo.html#a-plain-call",
-    "href": "demo/demo.html#a-plain-call",
-    "title": "Live demo",
-    "section": "A plain call",
-    "text": "A plain call\ngreet(\"world\")\ngreet() is called by name above and here in prose; both get a tooltip with its signature and one-line summary."
+    "objectID": "index.html#installation",
+    "href": "index.html#installation",
+    "title": "reftip",
+    "section": "",
+    "text": "Install from GitHub:\npak:pak(\"https://github.com/BjarkeHautop/reftip\")",
+    "crumbs": [
+      "Home"
+    ]
   },
   {
-    "objectID": "demo/demo.html#an-s3-method",
-    "href": "demo/demo.html#an-s3-method",
-    "title": "Live demo",
-    "section": "An S3 method",
-    "text": "An S3 method\nanimal() and print.animal() share one Rd page and one \\usage{} block; reftip narrows the tooltip to just the method actually called, something downlit alone won’t do for an unpublished package.\nrex &lt;- animal(\"Rex\", \"woof\")\nprint.animal(rex)"
+    "objectID": "index.html#build-locally",
+    "href": "index.html#build-locally",
+    "title": "reftip",
+    "section": "",
+    "text": "Both site types can be built from this repo using a couple of throwaway demo functions (see demo/demo.R) that exist only to show off the tooltips:\npkgload::load_all()\n\n# altdoc\nsource(\"altdoc/build-site.R\")\nbuild_site()\n\n# pkgdown\nsource(\"pkgdown/build-site.R\")\nbuild_site()\nOpen docs/index.html (altdoc) or docs-pkgdown/index.html (pkgdown) afterward and hover over functions to see it in action.",
+    "crumbs": [
+      "Home"
+    ]
   },
   {
-    "objectID": "demo/demo.html#a-known-limitation",
-    "href": "demo/demo.html#a-known-limitation",
-    "title": "Live demo",
-    "section": "A known limitation",
-    "text": "A known limitation\nGeneric dispatch can’t be resolved without evaluating the code and checking rex’s class at runtime, so a plain print(rex) stays untouched. See the “Known limitations” section of the README.\nprint(rex)"
+    "objectID": "index.html#whats-in-the-tooltip",
+    "href": "index.html#whats-in-the-tooltip",
+    "title": "reftip",
+    "section": "",
+    "text": "The matched \\usage{} line,\nThe first sentence of \\description{}.\n\nIf the description’s first sentence runs past 200 characters add_tooltips() warns, naming the Rd file, so you know to shorten it. Pass quiet = TRUE to suppress.",
+    "crumbs": [
+      "Home"
+    ]
+  },
+  {
+    "objectID": "index.html#known-limitations",
+    "href": "index.html#known-limitations",
+    "title": "reftip",
+    "section": "",
+    "text": "A generic call like print(x) isn’t resolved, since that needs knowing x’s class at runtime, and reftip only reads man/*.Rd. It doesn’t evaluate any code.\nSame reason obj$method() (R6) isn’t resolved: nothing says which class’s methods to look up.\nAn Rd page with several \\alias{}es sharing one \\usage{} block (an S3 generic plus its methods) shows that whole block in the tooltip, not just the one alias’s line.",
+    "crumbs": [
+      "Home"
+    ]
   },
   {
     "objectID": "vignettes/demo.html",
@@ -126,46 +148,6 @@
     ]
   },
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "reftip",
-    "section": "",
-    "text": "Hover tooltips for the function/reference links on an altdoc site. Inspired by DocumenterCodeBlocks.jl.\naltdoc’s quarto_website backend already turns function names in R code into links, via Quarto’s code-link and the downlit package. But downlit doesn’t know this package is unpublished. It still adds a link, just to a guessed CRAN/rdrr.io URL that doesn’t exist. And it won’t link an S3 method called by name, like print.animal(), at all.\nreftip fixes that. Run it once after altdoc::render_docs():\naltdoc::render_docs()\nreftip::add_tooltips()\nIt only touches references to the package’s own topics; anything else (base R, another package, code it can’t resolve at all) is left exactly as Quarto/downlit rendered it. It targets the quarto_website backend specifically; the other three (mkdocs, docsify, docute) haven’t been tried.\nSee it in action in live demo.\n\n\n\nThe matched \\usage{} line,\nThe first sentence of \\description{}.\n\nIf the description’s first sentence runs past 200 characters add_tooltips() warns, naming the Rd file, so you know to shorten it. Pass quiet = TRUE to suppress.\n\n\n\naltdown is a pkgdown-styled theme for altdoc sites. alttip shows an example site using altdown and reftip together.\n\n\n\n\nA generic call like print(x) isn’t resolved, since that needs knowing x’s class at runtime, and reftip only reads man/*.Rd. It doesn’t evaluate any code.\nSame reason obj$method() (R6) isn’t resolved: nothing says which class’s methods to look up.\nAn Rd page with several \\alias{}es sharing one \\usage{} block (an S3 generic plus its methods) shows that whole block in the tooltip, not just the one alias’s line.",
-    "crumbs": [
-      "Home"
-    ]
-  },
-  {
-    "objectID": "index.html#whats-in-the-tooltip",
-    "href": "index.html#whats-in-the-tooltip",
-    "title": "reftip",
-    "section": "",
-    "text": "The matched \\usage{} line,\nThe first sentence of \\description{}.\n\nIf the description’s first sentence runs past 200 characters add_tooltips() warns, naming the Rd file, so you know to shorten it. Pass quiet = TRUE to suppress.",
-    "crumbs": [
-      "Home"
-    ]
-  },
-  {
-    "objectID": "index.html#see-also",
-    "href": "index.html#see-also",
-    "title": "reftip",
-    "section": "",
-    "text": "altdown is a pkgdown-styled theme for altdoc sites. alttip shows an example site using altdown and reftip together.",
-    "crumbs": [
-      "Home"
-    ]
-  },
-  {
-    "objectID": "index.html#known-limitations",
-    "href": "index.html#known-limitations",
-    "title": "reftip",
-    "section": "",
-    "text": "A generic call like print(x) isn’t resolved, since that needs knowing x’s class at runtime, and reftip only reads man/*.Rd. It doesn’t evaluate any code.\nSame reason obj$method() (R6) isn’t resolved: nothing says which class’s methods to look up.\nAn Rd page with several \\alias{}es sharing one \\usage{} block (an S3 generic plus its methods) shows that whole block in the tooltip, not just the one alias’s line.",
-    "crumbs": [
-      "Home"
-    ]
-  },
-  {
     "objectID": "LICENSE.html",
     "href": "LICENSE.html",
     "title": "reftip",
@@ -180,18 +162,18 @@
     "href": "man/add_tooltips.html",
     "title": "reftip",
     "section": "",
-    "text": "Run after you build docs with altdoc::render_docs(). Reads the package’s own man/*.Rd files (see build_topic_index()) and rewrites every docs/**/*.html file, attaching a hover tooltip to each reference link that names a documented object in this package. Everything else is left untouched.\n\n\n\nadd_tooltips(path = \".\", docs_dir = NULL, quiet = FALSE)\n\n\n\n\n\n\n\npath\n\n\nPath to the package root.\n\n\n\n\ndocs_dir\n\n\nPath to the built site. Defaults to file.path(path, “docs”).\n\n\n\n\nquiet\n\n\nLogical. Suppress progress messages.\n\n\n\n\n\n\nIdempotent: a file that already carries reftip’s marker comment is skipped, so it’s safe to rerun after a fresh render_docs().\n\n\n\nInvisibly, a list with files (how many HTML files were touched) and links (how many reference links got a tooltip).",
+    "text": "Run after you build docs with altdoc::render_docs() or pkgdown::build_site(). Reads the package’s own man/*.Rd files (see build_topic_index()) and rewrites every docs/**/*.html file, attaching a hover tooltip to each reference link that names a documented object in this package. Everything else is left untouched.\n\n\n\nadd_tooltips(\n  path = \".\",\n  docs_dir = NULL,\n  site = c(\"auto\", \"altdoc\", \"pkgdown\"),\n  quiet = FALSE\n)\n\n\n\n\n\n\n\npath\n\n\nPath to the package root.\n\n\n\n\ndocs_dir\n\n\nPath to the built site. Defaults to file.path(path, “docs”).\n\n\n\n\nsite\n\n\nOne of “auto” (default), “altdoc”, or “pkgdown”. “auto” detects the site type from docs_dir’s layout: a reference/ subdirectory means pkgdown, a man/ subdirectory means altdoc.\n\n\n\n\nquiet\n\n\nLogical. Suppress progress messages.\n\n\n\n\n\n\nOn an altdoc site, downlit can’t resolve the package’s own (local, unpublished) functions, so reftip also relinks each reference straight to docs/man/&lt;topic&gt;.html. On a pkgdown site, downlit already resolves these correctly (it builds against the installed local package), so reftip leaves the existing link alone and only attaches the tooltip; it builds a link itself only for a name downlit left unlinked (e.g. an S3 method called by name).\nIdempotent: a file that already carries reftip’s marker comment is skipped, so it’s safe to rerun after a fresh build.\n\n\n\nInvisibly, a list with files (how many HTML files were touched) and links (how many reference links got a tooltip).",
     "crumbs": [
       "Reference",
       "add_tooltips"
     ]
   },
   {
-    "objectID": "man/add_tooltips.html#add-hover-tooltips-to-an-altdoc-sites-reference-links",
-    "href": "man/add_tooltips.html#add-hover-tooltips-to-an-altdoc-sites-reference-links",
+    "objectID": "man/add_tooltips.html#add-hover-tooltips-to-an-altdoc-or-pkgdown-sites-reference-links",
+    "href": "man/add_tooltips.html#add-hover-tooltips-to-an-altdoc-or-pkgdown-sites-reference-links",
     "title": "reftip",
     "section": "",
-    "text": "Run after you build docs with altdoc::render_docs(). Reads the package’s own man/*.Rd files (see build_topic_index()) and rewrites every docs/**/*.html file, attaching a hover tooltip to each reference link that names a documented object in this package. Everything else is left untouched.\n\n\n\nadd_tooltips(path = \".\", docs_dir = NULL, quiet = FALSE)\n\n\n\n\n\n\n\npath\n\n\nPath to the package root.\n\n\n\n\ndocs_dir\n\n\nPath to the built site. Defaults to file.path(path, “docs”).\n\n\n\n\nquiet\n\n\nLogical. Suppress progress messages.\n\n\n\n\n\n\nIdempotent: a file that already carries reftip’s marker comment is skipped, so it’s safe to rerun after a fresh render_docs().\n\n\n\nInvisibly, a list with files (how many HTML files were touched) and links (how many reference links got a tooltip).",
+    "text": "Run after you build docs with altdoc::render_docs() or pkgdown::build_site(). Reads the package’s own man/*.Rd files (see build_topic_index()) and rewrites every docs/**/*.html file, attaching a hover tooltip to each reference link that names a documented object in this package. Everything else is left untouched.\n\n\n\nadd_tooltips(\n  path = \".\",\n  docs_dir = NULL,\n  site = c(\"auto\", \"altdoc\", \"pkgdown\"),\n  quiet = FALSE\n)\n\n\n\n\n\n\n\npath\n\n\nPath to the package root.\n\n\n\n\ndocs_dir\n\n\nPath to the built site. Defaults to file.path(path, “docs”).\n\n\n\n\nsite\n\n\nOne of “auto” (default), “altdoc”, or “pkgdown”. “auto” detects the site type from docs_dir’s layout: a reference/ subdirectory means pkgdown, a man/ subdirectory means altdoc.\n\n\n\n\nquiet\n\n\nLogical. Suppress progress messages.\n\n\n\n\n\n\nOn an altdoc site, downlit can’t resolve the package’s own (local, unpublished) functions, so reftip also relinks each reference straight to docs/man/&lt;topic&gt;.html. On a pkgdown site, downlit already resolves these correctly (it builds against the installed local package), so reftip leaves the existing link alone and only attaches the tooltip; it builds a link itself only for a name downlit left unlinked (e.g. an S3 method called by name).\nIdempotent: a file that already carries reftip’s marker comment is skipped, so it’s safe to rerun after a fresh build.\n\n\n\nInvisibly, a list with files (how many HTML files were touched) and links (how many reference links got a tooltip).",
     "crumbs": [
       "Reference",
       "add_tooltips"
@@ -202,7 +184,7 @@
     "href": "man/greet.html",
     "title": "reftip",
     "section": "",
-    "text": "Prints a friendly greeting.\n\n\n\ngreet(name = \"world\")\n\n\n\n\n\n\n\nname\n\n\nCharacter. Who to greet.\n\n\n\n\n\n\nInvisibly, the greeting string.",
+    "text": "Prints a friendly greeting.\n\ngreet(name = \"world\")\n\n\n\n\nname\n\n\nCharacter. Who to greet.\n\n\nInvisibly, the greeting string.\n\n\nlibrary(\"reftip\")\n\ngreet(\"world\")",
     "crumbs": [
       "Reference",
       "greet"
@@ -213,7 +195,7 @@
     "href": "man/greet.html#greet-someone",
     "title": "reftip",
     "section": "",
-    "text": "Prints a friendly greeting.\n\n\n\ngreet(name = \"world\")\n\n\n\n\n\n\n\nname\n\n\nCharacter. Who to greet.\n\n\n\n\n\n\nInvisibly, the greeting string.",
+    "text": "Prints a friendly greeting.\n\ngreet(name = \"world\")\n\n\n\n\nname\n\n\nCharacter. Who to greet.\n\n\nInvisibly, the greeting string.\n\n\nlibrary(\"reftip\")\n\ngreet(\"world\")",
     "crumbs": [
       "Reference",
       "greet"

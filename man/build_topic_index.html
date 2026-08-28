@@ -391,7 +391,7 @@ ul.task-list li input[type="checkbox"] {
 <h2 class="unnumbered anchored" data-anchor-id="build-a-reference-index-from-a-packages-rd-files">Build a reference index from a package’s Rd files</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>Parses every <code style="white-space: pre;">man/*.Rd</code> file under <code>path</code> and returns, for each documented alias, its usage (signature), a one-line summary (first sentence of the description), and the topic (Rd file stem) it’s documented on.</p>
+<p>Parses every <code style="white-space: pre;">man/*.Rd</code> file under <code>path</code> and returns, for each documented alias, its usage, a one-line summary, and the topic it’s documented on.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -414,7 +414,7 @@ Path to the package root (must contain a <code style="white-space: pre;">man/</c
 <code id="quiet">quiet</code>
 </td>
 <td>
-Logical. Suppress the warnings issued when a <code style="white-space: pre;">\usage{}</code> block couldn’t be narrowed to one alias, or when a tooltip brief had to be truncated mid-sentence.
+Logical. Suppress the warnings issued when a <code style="white-space: pre;">\usage{}</code> block couldn’t be narrowed to one alias, or when a tooltip brief had to be truncated mid-word.
 </td>
 </tr>
 </tbody></table>
