@@ -146,10 +146,48 @@ test_that("repeated references to the same name share one tip id", {
     )
 })
 
-test_that(".reftip_man_href_prefix points at docs/man/ relative to the file's own depth", {
-    expect_equal(.reftip_man_href_prefix("/x/docs/index.html", "/x/docs"), "man/")
-    expect_equal(.reftip_man_href_prefix("/x/docs/vignettes/using.html", "/x/docs"), "../man/")
-    expect_equal(.reftip_man_href_prefix("/x/docs/man/foo.html", "/x/docs"), "./")
+test_that(".reftip_reference_href_prefix points at docs/man/ (or docs/reference/) relative to the file's own depth", {
+    expect_equal(.reftip_reference_href_prefix("/x/docs/index.html", "/x/docs"), "man/")
+    expect_equal(.reftip_reference_href_prefix("/x/docs/vignettes/using.html", "/x/docs"), "../man/")
+    expect_equal(.reftip_reference_href_prefix("/x/docs/man/foo.html", "/x/docs"), "./")
+    expect_equal(.reftip_reference_href_prefix("/x/docs/index.html", "/x/docs", "reference"), "reference/")
+})
+
+test_that("on pkgdown (overwrite_href = FALSE), an existing downlit href is kept and only tagged", {
+    index <- list(foo = list(usage = "foo(a, b)", brief = "Adds a and b.", topic = "foo"))
+    html <- .sample_html(paste0(
+        "<code class=\"sourceCode R\"><span class=\"fu\">",
+        "<a href=\"../reference/foo.html\">foo</a></span>",
+        "<span class=\"op\">(</span></code>"
+    ))
+
+    result <- .inject_tooltips_html(html, index, "reference/", overwrite_href = FALSE)
+
+    expect_equal(result$n, 1L)
+    expect_match(result$html, 'data-reftip="t1" href="../reference/foo.html"', fixed = TRUE)
+})
+
+test_that("on pkgdown, a name downlit left unlinked still gets a href built from the reference prefix", {
+    index <- list(print.animal = list(usage = "print.animal(x, ...)", brief = "Prints an animal.", topic = "animal"))
+    html <- .sample_html("<p>See <code>print.animal()</code> for details.</p>")
+
+    result <- .inject_tooltips_html(html, index, "reference/", overwrite_href = FALSE)
+
+    expect_equal(result$n, 1L)
+    expect_match(result$html, 'href="reference/animal.html"', fixed = TRUE)
+})
+
+test_that(".reftip_resolve_site auto-detects pkgdown vs. altdoc from docs_dir's layout", {
+    dir <- withr::local_tempdir()
+    fs::dir_create(fs::path_join(c(dir, "reference")))
+    expect_equal(.reftip_resolve_site("auto", dir), "pkgdown")
+
+    dir2 <- withr::local_tempdir()
+    fs::dir_create(fs::path_join(c(dir2, "man")))
+    expect_equal(.reftip_resolve_site("auto", dir2), "altdoc")
+
+    dir3 <- withr::local_tempdir()
+    expect_error(.reftip_resolve_site("auto", dir3), "couldn't detect")
 })
 
 test_that("add_tooltips rewrites files on disk, links locally, and is idempotent on rerun", {
@@ -176,6 +214,29 @@ test_that("add_tooltips rewrites files on disk, links locally, and is idempotent
     res2 <- add_tooltips(path = dir, quiet = TRUE)
     expect_equal(res2$files, 0L)
     expect_equal(res2$links, 0L)
+})
+
+test_that("add_tooltips on a pkgdown-shaped site keeps the existing (correct) href and only tags it", {
+    dir <- withr::local_tempdir()
+    fs::dir_create(fs::path_join(c(dir, "man")))
+    writeLines(c(
+        "\\name{foo}", "\\alias{foo}", "\\title{Foo}",
+        "\\usage{", "foo(a, b)", "}",
+        "\\description{", "Adds a and b.", "}"
+    ), fs::path_join(c(dir, "man", "foo.Rd")))
+
+    docs_dir <- fs::path_join(c(dir, "docs"))
+    fs::dir_create(fs::path_join(c(docs_dir, "reference")))
+    page <- fs::path_join(c(docs_dir, "index.html"))
+    writeLines(.sample_html(
+        "<span class=\"fu\"><a href=\"reference/foo.html\">foo</a></span>"
+    ), page)
+
+    res <- add_tooltips(path = dir, quiet = TRUE)
+    expect_equal(res$files, 1L)
+    expect_equal(res$links, 1L)
+    expect_match(readLines(page, warn = FALSE), 'href="reference/foo.html"', fixed = TRUE, all = FALSE)
+    expect_match(readLines(page, warn = FALSE), 'data-reftip="t1"', fixed = TRUE, all = FALSE)
 })
 
 test_that("add_tooltips errors when docs/ doesn't exist", {

@@ -8,16 +8,26 @@
 #
 # Unlike a package documenting a real public API, reftip's own site needs a
 # few fake, documented functions purely to show off its hover tooltips (see
-# altdoc/demo/demo.R and altdoc/demo/demo.qmd). Those are staged into man/
-# and vignettes/ only for the duration of the build, then removed, so
+# demo/demo.R, demo/demo.qmd, and demo/demo.Rmd). Those are staged into
+# man/ and vignettes/ only for the duration of the build, then removed, so
 # nothing about them ships in the package or lingers in the working tree.
+# demo/ lives at the repo root, outside altdoc/ and pkgdown/, since altdoc
+# mirrors the whole altdoc/ tree into its own Quarto project -- a second
+# demo.* file living there would collide with demo.qmd as a render target.
 
 pkg_path <- "."
 
-# Stage/unstage the demo API
+# Stage/unstage the demo API. `vignette` picks which narrative file to
+# stage as vignettes/demo.<ext>: "qmd" (altdoc's own Quarto backend), "rmd"
+# (pkgdown, via rmarkdown), or "none". Both narratives have the same
+# content -- Pandoc/knitr syntax-highlights their code blocks the same way
+# either backend renders them, so downlit (and reftip after it) can link
+# and tag them identically.
 
-stage_demo <- function(path = pkg_path) {
-  demo_src <- readLines(file.path(path, "altdoc", "demo", "demo.R"), warn = FALSE)
+stage_demo <- function(path = pkg_path, vignette = c("qmd", "rmd", "none")) {
+  vignette <- match.arg(vignette)
+
+  demo_src <- readLines(file.path(path, "demo", "demo.R"), warn = FALSE)
   rd <- roxygen2::roc_proc_text(roxygen2::rd_roclet(), paste(demo_src, collapse = "\n"))
 
   man_dir <- file.path(path, "man")
@@ -26,20 +36,34 @@ stage_demo <- function(path = pkg_path) {
     writeLines(format(rd[[nm]]), file.path(man_dir, nm))
   }
 
-  vig_dir <- file.path(path, "vignettes")
-  vig_existed <- dir.exists(vig_dir)
-  if (!vig_existed) dir.create(vig_dir)
-  qmd_path <- file.path(vig_dir, "demo.qmd")
-  file.copy(file.path(path, "altdoc", "demo", "demo.qmd"), qmd_path, overwrite = TRUE)
+  vig_path <- NULL
+  vig_dir <- NULL
+  vig_existed <- NA
+  if (vignette != "none") {
+    # pkgdown expects the conventional "Rmd" case; altdoc's Quarto backend
+    # expects lowercase "qmd".
+    filename <- paste0("demo.", c(qmd = "qmd", rmd = "Rmd")[[vignette]])
+    src_path <- file.path(path, "demo", filename)
 
-  list(rd_paths = rd_paths, qmd_path = qmd_path, vig_dir = vig_dir, vig_existed = vig_existed)
+    vig_dir <- file.path(path, "vignettes")
+    vig_existed <- dir.exists(vig_dir)
+    if (!vig_existed) dir.create(vig_dir)
+    vig_path <- file.path(vig_dir, filename)
+    if (!file.copy(src_path, vig_path, overwrite = TRUE)) {
+      stop(sprintf("Failed to stage demo vignette from '%s' to '%s'.", src_path, vig_path), call. = FALSE)
+    }
+  }
+
+  list(rd_paths = rd_paths, vig_path = vig_path, vig_dir = vig_dir, vig_existed = vig_existed)
 }
 
 unstage_demo <- function(staged) {
   unlink(staged$rd_paths)
-  unlink(staged$qmd_path)
-  if (!staged$vig_existed && length(list.files(staged$vig_dir)) == 0) {
-    unlink(staged$vig_dir, recursive = TRUE)
+  if (!is.null(staged$vig_path)) {
+    unlink(staged$vig_path)
+    if (!staged$vig_existed && length(list.files(staged$vig_dir)) == 0) {
+      unlink(staged$vig_dir, recursive = TRUE)
+    }
   }
 }
 

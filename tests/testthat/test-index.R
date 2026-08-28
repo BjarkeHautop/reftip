@@ -95,9 +95,28 @@ test_that("a description with no sentence boundary within 200 characters warns a
         "}"
     ))
 
-    expect_warning(index <- build_topic_index(dir), "truncated mid-sentence")
+    expect_warning(index <- build_topic_index(dir), "truncated mid-word")
     expect_true(endsWith(index$foo$brief, "..."))
     expect_no_warning(build_topic_index(dir, quiet = TRUE))
+})
+
+test_that("a single well-formed sentence that simply runs past 200 characters also warns and clips", {
+    dir <- withr::local_tempdir()
+    long_sentence <- paste0(paste(rep("word", 45), collapse = " "), ".")
+    .write_rd(dir, "foo", c(
+        "\\name{foo}",
+        "\\alias{foo}",
+        "\\title{Foo}",
+        "\\usage{",
+        "foo()",
+        "}",
+        "\\description{",
+        long_sentence,
+        "}"
+    ))
+
+    expect_warning(index <- build_topic_index(dir), "truncated mid-word")
+    expect_true(endsWith(index$foo$brief, "..."))
 })
 
 test_that("a topic with no description prose has a NULL brief", {

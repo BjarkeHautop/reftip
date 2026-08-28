@@ -5,6 +5,7 @@
 *.Rcheck/
 inst/doc
 docs/
+docs-pkgdown/
 _quarto/
 dev/fixturepkg/docs/
 dev/fixturepkg/_quarto/
@@ -18,3 +19,4 @@ _quarto/*
 man/animal.Rd
 man/greet.Rd
 vignettes/demo.qmd
+vignettes/demo.Rmd

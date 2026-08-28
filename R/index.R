@@ -1,8 +1,7 @@
 #' Build a reference index from a package's Rd files
 #'
 #' Parses every `man/*.Rd` file under `path` and returns, for each documented
-#' alias, its usage (signature), a one-line summary (first sentence of the
-#' description), and the topic (Rd file stem) it's documented on.
+#' alias, its usage, a one-line summary, and the topic it's documented on.
 #'
 #' When an Rd page documents several aliases (e.g. an S3 generic and its
 #' methods), its `\\usage{}` block is split on blank lines and each alias is
@@ -13,7 +12,7 @@
 #' @param path Path to the package root (must contain a `man/` directory).
 #' @param quiet Logical. Suppress the warnings issued when a `\\usage{}` block
 #'   couldn't be narrowed to one alias, or when a tooltip brief had to be
-#'   truncated mid-sentence.
+#'   truncated mid-word.
 #' @return A named list, one entry per alias, each holding `usage`, `brief`
 #'   (character or `NULL`), and `topic`.
 #' @export
@@ -60,7 +59,7 @@ build_topic_index <- function(path = ".", quiet = FALSE) {
         }
         if (!quiet && sentence$clipped) {
             warning(sprintf(
-                "reftip: the \\description{} for '%s' has no sentence boundary within 200 characters; the tooltip brief is truncated mid-sentence. Start \\description{} with one short summary sentence.",
+                "reftip: the tooltip brief for '%s' is longer than 200 characters and got truncated mid-word. Shorten the first sentence of \\description{} to fit within 200 characters.",
                 basename(rd_file)
             ), call. = FALSE)
         }

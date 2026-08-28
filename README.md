@@ -1,30 +1,52 @@
 # reftip
 
 Hover tooltips for the function/reference links on an
+[pkgdown](https://pkgdown.r-lib.org/) or
 [altdoc](https://github.com/etiennebacher/altdoc) site. Inspired by
 [DocumenterCodeBlocks.jl](https://fredrikekre.github.io/DocumenterCodeBlocks.jl/dev/).
 
-altdoc's `quarto_website` backend already turns function names in R code
-into links, via Quarto's `code-link` and the
-[downlit](https://downlit.r-lib.org/) package. But downlit doesn't know
-this package is unpublished. It still adds a link, just to a guessed
-CRAN/rdrr.io URL that doesn't exist. And it won't link an S3 method
-called by name, like `print.animal()`, at all.
-
-reftip fixes that. Run it once after `altdoc::render_docs()`:
+Build your docs like normal via `pkgdown::build_site()` or `altdoc::render_docs()`
+and then run:
 
 ``` r
-altdoc::render_docs()
 reftip::add_tooltips()
 ```
 
-It only touches references to the package's own topics; anything else
-(base R, another package, code it can't resolve at all) is left exactly
-as Quarto/downlit rendered it. It targets the `quarto_website` backend
-specifically; the other three (mkdocs, docsify, docute) haven't been
-tried.
+It auto-detects which of the two built the site; pass `site = "altdoc"` or
+`site = "pkgdown"` explicitly if detection is ambiguous. Either way the tooltip, only
+touches references to the package's own topics; anything else (base R,
+another package, code it can't resolve) is left alone.
 
 See it in action in [live demo](https://bjarkehautop.github.io/reftip/vignettes/demo.html).
+
+## Installation
+
+Install from GitHub:
+
+``` r
+pak:pak("https://github.com/BjarkeHautop/reftip")
+```
+
+## Build locally
+
+Both site types can be built from this repo using a couple of throwaway
+demo functions (see `demo/demo.R`) that exist only to show off the
+tooltips:
+
+``` r
+pkgload::load_all()
+
+# altdoc
+source("altdoc/build-site.R")
+build_site()
+
+# pkgdown
+source("pkgdown/build-site.R")
+build_site()
+```
+
+Open `docs/index.html` (altdoc) or `docs-pkgdown/index.html` (pkgdown)
+afterward and hover over functions to see it in action.
 
 ## What's in the tooltip
 
@@ -33,12 +55,6 @@ See it in action in [live demo](https://bjarkehautop.github.io/reftip/vignettes/
 
 If the description's first sentence runs past 200 characters `add_tooltips()` warns, naming the Rd file, so you know to
 shorten it. Pass `quiet = TRUE` to suppress.
-
-## See also
-
-[altdown](https://github.com/BjarkeHautop/altdown) is a pkgdown-styled
-theme for altdoc sites. [alttip](https://github.com/bjarkehautop/alttip)
-shows an example site using altdown and reftip together.
 
 ## Known limitations
 

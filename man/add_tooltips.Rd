@@ -2,14 +2,23 @@
 % Please edit documentation in R/inject.R
 \name{add_tooltips}
 \alias{add_tooltips}
-\title{Add hover tooltips to an altdoc site's reference links}
+\title{Add hover tooltips to an altdoc or pkgdown site's reference links}
 \usage{
-add_tooltips(path = ".", docs_dir = NULL, quiet = FALSE)
+add_tooltips(
+  path = ".",
+  docs_dir = NULL,
+  site = c("auto", "altdoc", "pkgdown"),
+  quiet = FALSE
+)
 }
 \arguments{
 \item{path}{Path to the package root.}
 
 \item{docs_dir}{Path to the built site. Defaults to \code{file.path(path, "docs")}.}
+
+\item{site}{One of \code{"auto"} (default), \code{"altdoc"}, or \code{"pkgdown"}.
+\code{"auto"} detects the site type from \code{docs_dir}'s layout: a \verb{reference/}
+subdirectory means pkgdown, a \verb{man/} subdirectory means altdoc.}
 
 \item{quiet}{Logical. Suppress progress messages.}
 }
@@ -18,12 +27,21 @@ Invisibly, a list with \code{files} (how many HTML files were touched)
 and \code{links} (how many reference links got a tooltip).
 }
 \description{
-Run after you build docs with \code{altdoc::render_docs()}. Reads the package's own \verb{man/*.Rd}
-files (see \code{\link[=build_topic_index]{build_topic_index()}}) and rewrites every \verb{docs/**/*.html}
-file, attaching a hover tooltip to each reference link that names a
-documented object in this package. Everything else is left untouched.
+Run after you build docs with \code{altdoc::render_docs()} or
+\code{pkgdown::build_site()}. Reads the package's own \verb{man/*.Rd} files (see
+\code{\link[=build_topic_index]{build_topic_index()}}) and rewrites every \verb{docs/**/*.html} file,
+attaching a hover tooltip to each reference link that names a documented
+object in this package. Everything else is left untouched.
 }
 \details{
+On an altdoc site, downlit can't resolve the package's own (local,
+unpublished) functions, so reftip also relinks each reference straight to
+\verb{docs/man/<topic>.html}. On a pkgdown site, downlit already resolves
+these correctly (it builds against the installed local package), so
+reftip leaves the existing link alone and only attaches the tooltip;
+it builds a link itself only for a name downlit left unlinked (e.g. an S3
+method called by name).
+
 Idempotent: a file that already carries reftip's marker comment is
-skipped, so it's safe to rerun after a fresh \code{render_docs()}.
+skipped, so it's safe to rerun after a fresh build.
 }

@@ -3,5 +3,9 @@
 ^README\.md$
 ^\.lintr$
 ^docs$
+^docs-pkgdown$
 ^altdoc$
+^pkgdown$
+^demo$
+^_pkgdown\.yml$
 ^_quarto$

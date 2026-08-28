@@ -1,8 +1,8 @@
 # Rewrites Quarto's rendered HTML so references to this package's own
-# documented topics link straight to docs/man/<topic>.html and get a hover
-# tooltip, instead of relying on downlit (which can't resolve a local/
-# unpublished package, or a name it can't statically dispatch, e.g. an S3
-# method called by name).
+# documented topics get a hover tooltip, instead of relying on downlit alone
+# (which can't resolve a name it can't statically dispatch, e.g. an S3
+# method called by name, and, on an altdoc site, can't resolve a local/
+# unpublished package at all).
 #
 # Two reference shapes are matched, each optionally already wrapped in a
 # downlit link:
@@ -10,45 +10,64 @@
 #     `<span class="fu">name</span>` (or "va" for a referenced-but-not-
 #     called value, e.g. an R6 class name).
 #  2. Inline code in prose (`` `foo()` ``): `<code>name()</code>`.
-# Both may already carry an `<a href="...">` from downlit; it's discarded
-# when the name is one of ours, kept otherwise.
+# Both may already carry an `<a href="...">` from downlit. On altdoc that
+# href is wrong for our own package (downlit built against a name it
+# couldn't resolve locally) and is always replaced. On pkgdown, downlit
+# builds against the installed local package and already gets it right, so
+# the existing href is kept and only a tooltip is attached; the href is
+# built from scratch only when downlit left the name unlinked.
 
 .FU_LINK_RE <- paste0(
-    "<span class=\"(fu|va)\">(?:<a href=\"[^\"]*\">)?([^<]*?)(?:</a>)?</span>",
+    "<span class=\"(fu|va)\">(?:<a href=\"([^\"]*)\">)?([^<]*?)(?:</a>)?</span>",
     "|",
-    "<code>(?:<a href=\"[^\"]*\">)?([^<]*?)(?:</a>)?</code>"
+    "<code>(?:<a href=\"([^\"]*)\">)?([^<]*?)(?:</a>)?</code>"
 )
 
-#' Add hover tooltips to an altdoc site's reference links
+#' Add hover tooltips to an altdoc or pkgdown site's reference links
 #'
-#' Run after you build docs with `altdoc::render_docs()`. Reads the package's own `man/*.Rd`
-#' files (see [build_topic_index()]) and rewrites every `docs/**/*.html`
-#' file, attaching a hover tooltip to each reference link that names a
-#' documented object in this package. Everything else is left untouched.
+#' Run after you build docs with `altdoc::render_docs()` or
+#' `pkgdown::build_site()`. Reads the package's own `man/*.Rd` files (see
+#' [build_topic_index()]) and rewrites every `docs/**/*.html` file,
+#' attaching a hover tooltip to each reference link that names a documented
+#' object in this package. Everything else is left untouched.
+#'
+#' On an altdoc site, downlit can't resolve the package's own (local,
+#' unpublished) functions, so reftip also relinks each reference straight to
+#' `docs/man/<topic>.html`. On a pkgdown site, downlit already resolves
+#' these correctly (it builds against the installed local package), so
+#' reftip leaves the existing link alone and only attaches the tooltip;
+#' it builds a link itself only for a name downlit left unlinked (e.g. an S3
+#' method called by name).
 #'
 #' Idempotent: a file that already carries reftip's marker comment is
-#' skipped, so it's safe to rerun after a fresh `render_docs()`.
+#' skipped, so it's safe to rerun after a fresh build.
 #'
 #' @param path Path to the package root.
 #' @param docs_dir Path to the built site. Defaults to `file.path(path,
 #'   "docs")`.
+#' @param site One of `"auto"` (default), `"altdoc"`, or `"pkgdown"`.
+#'   `"auto"` detects the site type from `docs_dir`'s layout: a `reference/`
+#'   subdirectory means pkgdown, a `man/` subdirectory means altdoc.
 #' @param quiet Logical. Suppress progress messages.
 #' @return Invisibly, a list with `files` (how many HTML files were touched)
 #'   and `links` (how many reference links got a tooltip).
 #' @export
-add_tooltips <- function(path = ".", docs_dir = NULL, quiet = FALSE) {
+add_tooltips <- function(path = ".", docs_dir = NULL, site = c("auto", "altdoc", "pkgdown"), quiet = FALSE) {
+    site <- match.arg(site)
     if (is.null(docs_dir)) {
         docs_dir <- fs::path_join(c(path, "docs"))
     }
     if (!fs::dir_exists(docs_dir)) {
         stop(
             sprintf(
-                "No built site found at '%s'. Run altdoc::render_docs() first.",
+                "No built site found at '%s'. Run altdoc::render_docs() or pkgdown::build_site() first.",
                 docs_dir
             ),
             call. = FALSE
         )
     }
+    site <- .reftip_resolve_site(site, docs_dir)
+    reference_dir <- if (site == "pkgdown") "reference" else "man"
 
     index <- build_topic_index(path, quiet = quiet)
     if (length(index) == 0) {
@@ -73,8 +92,8 @@ add_tooltips <- function(path = ".", docs_dir = NULL, quiet = FALSE) {
             next
         }
 
-        man_href_prefix <- .reftip_man_href_prefix(f, docs_dir)
-        result <- .inject_tooltips_html(html, index, man_href_prefix)
+        href_prefix <- .reftip_reference_href_prefix(f, docs_dir, reference_dir)
+        result <- .inject_tooltips_html(html, index, href_prefix, overwrite_href = site != "pkgdown")
         if (result$n == 0) {
             next
         }
@@ -127,20 +146,57 @@ add_tooltips <- function(path = ".", docs_dir = NULL, quiet = FALSE) {
     invisible(list(files = n_files, links = n_links))
 }
 
-# Relative path from a rendered page to docs/man/, e.g. "man/" from
-# docs/index.html or "../man/" one directory down.
-.reftip_man_href_prefix <- function(file, docs_dir) {
-    man_dir <- fs::path(docs_dir, "man")
-    rel <- fs::path_rel(man_dir, start = fs::path_dir(file))
+# Detects the site type from docs_dir's layout when site == "auto"; errors
+# if neither a reference/ (pkgdown) nor a man/ (altdoc) subdirectory is
+# found, or a specific site was requested but its subdirectory is missing.
+.reftip_resolve_site <- function(site, docs_dir) {
+    has_reference <- fs::dir_exists(fs::path(docs_dir, "reference"))
+    has_man <- fs::dir_exists(fs::path(docs_dir, "man"))
+
+    if (site == "auto") {
+        if (has_reference && !has_man) {
+            return("pkgdown")
+        }
+        if (has_man && !has_reference) {
+            return("altdoc")
+        }
+        stop(
+            sprintf(
+                "reftip: couldn't detect the site type from '%s' (found %s). Pass site = \"altdoc\" or site = \"pkgdown\" explicitly.",
+                docs_dir,
+                if (has_reference && has_man) "both reference/ and man/" else "neither reference/ nor man/"
+            ),
+            call. = FALSE
+        )
+    }
+
+    needed <- if (site == "pkgdown") "reference" else "man"
+    if (!fs::dir_exists(fs::path(docs_dir, needed))) {
+        stop(
+            sprintf("reftip: site = \"%s\" but '%s' has no '%s/' subdirectory.", site, docs_dir, needed),
+            call. = FALSE
+        )
+    }
+    site
+}
+
+# Relative path from a rendered page to docs/<reference_dir>/, e.g. "man/"
+# from docs/index.html or "../reference/" one directory down.
+.reftip_reference_href_prefix <- function(file, docs_dir, reference_dir = "man") {
+    ref_dir <- fs::path(docs_dir, reference_dir)
+    rel <- fs::path_rel(ref_dir, start = fs::path_dir(file))
     paste0(as.character(rel), "/")
 }
 
 # One pass over an HTML document: every `.FU_LINK_RE` match that resolves in
-# `index` is relinked to docs/man/<topic>.html and tagged with
-# `data-reftip="<id>"`; everything else passes through unchanged. `tips`
-# collects one entry per unique resolved name (id -> {usage, brief, topic}),
-# the page's hidden tooltip payload.
-.inject_tooltips_html <- function(html, index, man_href_prefix = "man/") {
+# `index` is tagged with `data-reftip="<id>"`; everything else passes
+# through unchanged. When `overwrite_href` is TRUE (altdoc), the href is
+# always rebuilt from `href_prefix`; when FALSE (pkgdown), an existing
+# downlit href is kept as-is and `href_prefix` is used only as a fallback
+# for a name downlit left unlinked. `tips` collects one entry per unique
+# resolved name (id -> {usage, brief, topic}), the page's hidden tooltip
+# payload.
+.inject_tooltips_html <- function(html, index, href_prefix = "man/", overwrite_href = TRUE) {
     m <- gregexpr(.FU_LINK_RE, html, perl = TRUE)[[1]]
     if (m[1] == -1) {
         return(list(html = html, n = 0L, tips = list()))
@@ -171,12 +227,22 @@ add_tooltips <- function(path = ".", docs_dir = NULL, quiet = FALSE) {
         } else {
             NA
         }
-        name_col <- if (is_block) 2L else 3L
+        href_col <- if (is_block) 2L else 4L
+        name_col <- if (is_block) 3L else 5L
         name_html <- substr(
             html,
             cap_starts[i, name_col],
             cap_starts[i, name_col] + cap_lens[i, name_col] - 1L
         )
+        existing_href <- if (cap_starts[i, href_col] > 0L) {
+            substr(
+                html,
+                cap_starts[i, href_col],
+                cap_starts[i, href_col] + cap_lens[i, href_col] - 1L
+            )
+        } else {
+            NA_character_
+        }
         name <- .html_unescape(name_html)
         # strip a trailing call, e.g. "foo(1, 2)" -> "foo", and a wrapping
         # backtick pair from a literal `` `name<-`() `` in prose
@@ -197,7 +263,11 @@ add_tooltips <- function(path = ".", docs_dir = NULL, quiet = FALSE) {
                 entry$name <- lookup
                 tips[[id]] <- entry
             }
-            href <- paste0(man_href_prefix, entry$topic, ".html")
+            href <- if (!overwrite_href && !is.na(existing_href) && nzchar(existing_href)) {
+                existing_href
+            } else {
+                paste0(href_prefix, entry$topic, ".html")
+            }
             pieces[[pi]] <- if (is_block) {
                 sprintf(
                     '<span class="%s"><a class="reftip-ref" data-reftip="%s" href="%s">%s</a></span>',

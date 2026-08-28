@@ -10,6 +10,10 @@
 #'
 #' @param name Character. Who to greet.
 #' @return Invisibly, the greeting string.
+#' @examples
+#' \dontrun{
+#' greet("world")
+#' }
 #' @export
 greet <- function(name = "world") {
   msg <- paste0("Hello, ", name, "!")
@@ -25,6 +29,11 @@ greet <- function(name = "world") {
 #' @param name Character. The animal's name.
 #' @param sound Character. The sound it makes.
 #' @return An object of class `animal`.
+#' @examples
+#' \dontrun{
+#' rex <- animal("Rex", "woof")
+#' print.animal(rex)
+#' }
 #' @export
 animal <- function(name, sound) {
   structure(list(name = name, sound = sound), class = "animal")

@@ -1,12 +1,12 @@
 Package: reftip
-Title: Hover Tooltips for Reference Links in altdoc Sites
+Title: Hover Tooltips for Reference Links in altdoc and pkgdown Sites
 Version: 0.0.0.9000
 Date: 2026-08-27
 Authors@R: person("Bjarke", "Hautop", email = "bjarke.hautop@gmail.com", role = c("aut", "cre"))
 Description: Adds hover tooltips to the function reference links that
-    'altdoc' creates in a rendered R code block, showing the target's signature
-    and a one-line summary. Runs as a post-processing step after
-    `altdoc::render_docs()`.
+    'altdoc' or 'pkgdown' create in a rendered R code block, showing the
+    target's signature and a one-line summary. Runs as a post-processing
+    step after `altdoc::render_docs()` or `pkgdown::build_site()`.
 License: MIT + file LICENSE
 URL: https://github.com/BjarkeHautop/reftip
 BugReports: https://github.com/BjarkeHautop/reftip/issues
@@ -17,8 +17,10 @@ Imports:
     fs
 Suggests:
     altdoc,
+    pkgdown,
     pkgload,
     quarto,
+    rmarkdown,
     roxygen2,
     testthat (>= 3.0.0),
     withr

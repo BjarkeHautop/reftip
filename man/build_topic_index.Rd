@@ -11,7 +11,7 @@ build_topic_index(path = ".", quiet = FALSE)
 
 \item{quiet}{Logical. Suppress the warnings issued when a \verb{\\\\usage\{\}} block
 couldn't be narrowed to one alias, or when a tooltip brief had to be
-truncated mid-sentence.}
+truncated mid-word.}
 }
 \value{
 A named list, one entry per alias, each holding \code{usage}, \code{brief}
@@ -19,8 +19,7 @@ A named list, one entry per alias, each holding \code{usage}, \code{brief}
 }
 \description{
 Parses every \verb{man/*.Rd} file under \code{path} and returns, for each documented
-alias, its usage (signature), a one-line summary (first sentence of the
-description), and the topic (Rd file stem) it's documented on.
+alias, its usage, a one-line summary, and the topic it's documented on.
 }
 \details{
 When an Rd page documents several aliases (e.g. an S3 generic and its
