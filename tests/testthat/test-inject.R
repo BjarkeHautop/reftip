@@ -94,6 +94,27 @@ test_that("an inline code reference to a backtick-quoted name (e.g. a replacemen
     expect_equal(result$tips[["t1"]]$usage, "name(x) <- value")
 })
 
+test_that("an inline code reference qualified with the package's own namespace resolves", {
+    index <- list(foo = list(usage = "foo(a, b)", brief = "Adds a and b.", topic = "foo"))
+    html <- .sample_html("<p><code>p::foo()</code> and <code>p:::foo(1, 2)</code></p>")
+
+    result <- .inject_tooltips_html(html, index, "man/", pkg = "p")
+
+    expect_equal(result$n, 2L)
+    expect_length(result$tips, 1L)
+    expect_match(result$html, "<code><a class=\"reftip-ref\" data-reftip=\"t1\" href=\"man/foo.html\">p::foo()</a></code>", fixed = TRUE)
+})
+
+test_that("an inline code reference qualified with another package's namespace is left untouched", {
+    index <- list(foo = list(usage = "foo(a, b)", brief = "Adds a and b.", topic = "foo"))
+    html <- .sample_html("<p><code>other::foo()</code></p>")
+
+    result <- .inject_tooltips_html(html, index, "man/", pkg = "p")
+
+    expect_equal(result$n, 0L)
+    expect_equal(result$html, html)
+})
+
 test_that("an inline code block (with a fu span) doesn't also match the inline pattern", {
     index <- list(foo = list(usage = "foo(a, b)", brief = "Adds a and b.", topic = "foo"))
     html <- .sample_html(paste0(

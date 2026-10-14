@@ -70,6 +70,7 @@ add_tooltips <- function(path = ".", docs_dir = NULL, site = c("auto", "altdoc",
     reference_dir <- if (site == "pkgdown") "reference" else "man"
 
     index <- build_topic_index(path, quiet = quiet)
+    pkg <- .reftip_package_name(path)
     if (length(index) == 0) {
         if (!quiet) {
             message(
@@ -93,7 +94,7 @@ add_tooltips <- function(path = ".", docs_dir = NULL, site = c("auto", "altdoc",
         }
 
         href_prefix <- .reftip_reference_href_prefix(f, docs_dir, reference_dir)
-        result <- .inject_tooltips_html(html, index, href_prefix, overwrite_href = site != "pkgdown")
+        result <- .inject_tooltips_html(html, index, href_prefix, overwrite_href = site != "pkgdown", pkg = pkg)
         if (result$n == 0) {
             next
         }
@@ -180,6 +181,15 @@ add_tooltips <- function(path = ".", docs_dir = NULL, site = c("auto", "altdoc",
     site
 }
 
+# The package's name from DESCRIPTION, or NULL if there isn't one.
+.reftip_package_name <- function(path) {
+    desc_path <- fs::path_join(c(path, "DESCRIPTION"))
+    if (!fs::file_exists(desc_path)) {
+        return(NULL)
+    }
+    unname(read.dcf(desc_path, fields = "Package")[1, 1])
+}
+
 # Relative path from a rendered page to docs/<reference_dir>/, e.g. "man/"
 # from docs/index.html or "../reference/" one directory down.
 .reftip_reference_href_prefix <- function(file, docs_dir, reference_dir = "man") {
@@ -195,8 +205,9 @@ add_tooltips <- function(path = ".", docs_dir = NULL, site = c("auto", "altdoc",
 # downlit href is kept as-is and `href_prefix` is used only as a fallback
 # for a name downlit left unlinked. `tips` collects one entry per unique
 # resolved name (id -> {usage, brief, topic}), the page's hidden tooltip
-# payload.
-.inject_tooltips_html <- function(html, index, href_prefix = "man/", overwrite_href = TRUE) {
+# payload. `pkg` is the package's own name, so an inline `pkg::foo()`
+# resolves like `foo()`.
+.inject_tooltips_html <- function(html, index, href_prefix = "man/", overwrite_href = TRUE, pkg = NULL) {
     m <- gregexpr(.FU_LINK_RE, html, perl = TRUE)[[1]]
     if (m[1] == -1) {
         return(list(html = html, n = 0L, tips = list()))
@@ -244,9 +255,13 @@ add_tooltips <- function(path = ".", docs_dir = NULL, site = c("auto", "altdoc",
             NA_character_
         }
         name <- .html_unescape(name_html)
-        # strip a trailing call, e.g. "foo(1, 2)" -> "foo", and a wrapping
-        # backtick pair from a literal `` `name<-`() `` in prose
+        # strip a trailing call, e.g. "foo(1, 2)" -> "foo", this package's
+        # own namespace, e.g. "pkg::foo" -> "foo", and a wrapping backtick
+        # pair from a literal `` `name<-`() `` in prose
         lookup <- sub("\\(.*$", "", name, perl = TRUE)
+        if (!is.null(pkg)) {
+            lookup <- sub(paste0("^", pkg, ":::?"), "", lookup)
+        }
         lookup <- sub("^`(.*)`$", "\\1", lookup)
 
         entry <- index[[lookup]]
