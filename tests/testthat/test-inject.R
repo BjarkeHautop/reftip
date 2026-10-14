@@ -55,6 +55,16 @@ test_that("a topic with no \\usage{} (e.g. an R6 class) shows its name, not the 
     expect_match(payload, '<code class="reftip-sig">Counter</code>', fixed = TRUE)
 })
 
+test_that("code in the brief is rendered as <code>, with its contents escaped", {
+    tips <- list(t1 = list(usage = "f()", brief = "Stored in `dir(\"a\") < b`.", name = "f"))
+    payload <- .reftip_payload_html(tips)
+    expect_match(
+        payload,
+        '<span class="reftip-brief">Stored in <code>dir(&quot;a&quot;) &lt; b</code>.</span>',
+        fixed = TRUE
+    )
+})
+
 test_that("an inline code reference (no fu span), already linked by downlit, is relinked and tagged", {
     index <- list(foo = list(usage = "foo(a, b)", brief = "Adds a and b.", topic = "foo"))
     html <- .sample_html(paste0(

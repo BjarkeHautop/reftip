@@ -23,7 +23,7 @@ test_that("build_topic_index extracts usage and first-sentence brief", {
     expect_equal(index$foo$usage, "foo(a, b)")
     expect_equal(
         index$foo$brief,
-        "Adds a and b together and returns the sum."
+        "Adds `a` and `b` together and returns the sum."
     )
     expect_equal(index$foo$topic, "foo")
 })

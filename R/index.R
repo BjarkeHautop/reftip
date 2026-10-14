@@ -122,13 +122,30 @@ build_topic_index <- function(path = ".", quiet = FALSE) {
 }
 
 # Plain-text content of a top-level Rd section (e.g. "\\usage"), stripped of
-# markup. NULL when the section is absent.
+# markup except code, which is kept as `backticks` so the tooltip can render
+# it as <code>. NULL when the section is absent.
 .rd_section_text <- function(rd, tags, section) {
     hit <- rd[tags == section]
     if (length(hit) == 0) {
         return(NULL)
     }
-    text <- paste(unlist(hit), collapse = "")
+    text <- paste(vapply(hit, .rd_flatten, character(1)), collapse = "")
     text <- trimws(text)
     if (nchar(text) == 0) NULL else text
+}
+
+.rd_flatten <- function(x) {
+    tag <- attr(x, "Rd_tag")
+    if (identical(tag, "COMMENT")) {
+        return("")
+    }
+    if (is.character(x)) {
+        return(paste(x, collapse = ""))
+    }
+    inner <- paste(vapply(x, .rd_flatten, character(1)), collapse = "")
+    if (!is.null(tag) && tag %in% c("\\code", "\\verb", "\\samp")) {
+        paste0("`", inner, "`")
+    } else {
+        inner
+    }
 }

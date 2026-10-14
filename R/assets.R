@@ -37,7 +37,9 @@
         t <- tips[[id]]
         sig <- if (!is.null(t$usage)) t$usage else t$name
         brief_html <- if (!is.null(t$brief)) {
-            paste0("<span class=\"reftip-brief\">", .html_escape(t$brief), "</span>")
+            # `code` in the brief (kept from Rd \code{}) becomes <code>
+            brief <- gsub("`([^`]+)`", "<code>\\1</code>", .html_escape(t$brief))
+            paste0("<span class=\"reftip-brief\">", brief, "</span>")
         } else {
             ""
         }
